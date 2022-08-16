@@ -5,3 +5,4 @@
 - Chakra UI
 - Framer motion
 - Tailwind CSS
+  -react-query
