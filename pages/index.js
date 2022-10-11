@@ -1,3 +1,8 @@
+import { Text } from "@chakra-ui/react";
 export default function Home() {
-  return <div></div>;
+  return (
+    <div>
+      <Text color={"brand.900"}>Hello world</Text>
+    </div>
+  );
 }
