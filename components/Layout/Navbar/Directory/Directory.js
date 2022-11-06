@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { AuthModalContext } from "../../../../store/AuthmodalProvider";
+import React from "react";
+
 import {
   Button,
   Text,
@@ -15,12 +15,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 
 import Communities from "./Communities";
 
-import { useUserAuth, useSignOut } from "../../../../store/reactQueryHooks";
-
 const Directory = () => {
-  const { data: user, isLoading, error } = useUserAuth();
-  const { mutate } = useSignOut();
-  const { setModalSettings } = useContext(AuthModalContext);
   return (
     <div>
       <Menu>

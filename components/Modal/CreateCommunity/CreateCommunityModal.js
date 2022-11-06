@@ -18,13 +18,15 @@ import {
 } from "@chakra-ui/react";
 
 import { useState } from "react";
-import { addCommunityName } from "../../../firebase/firebaseFunctions";
+import { useMutationCommunity } from "../../../store/reactQueryHooks";
 
 const CreateCommunityModal = ({ open, handleClose }) => {
   const [communityName, setCommunityName] = useState("");
   const [charsRemaining, setCharsRemaining] = useState(21);
   const [communityType, setCommunityType] = useState("public");
   const [error, setError] = useState("");
+
+  const { isLoading, error: queryError, mutate } = useMutationCommunity();
 
   const onChangeHandler = (e) => {
     // subtract the char limit of 21
@@ -37,9 +39,10 @@ const CreateCommunityModal = ({ open, handleClose }) => {
     setCommunityType(e.target.name);
   };
 
-  const CreateCommunityHandler = () => {
+  const createCommunityHandler = async () => {
+    if (error) setError("");
     const format = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi;
-    if (communityName.test(format) || communityName.length < 3) {
+    if (format.test(communityName) || communityName.length < 3) {
       setError(
         "Community names must be between 3-21 characters, and can only contain letters numbers, or underscores"
       );
@@ -47,6 +50,9 @@ const CreateCommunityModal = ({ open, handleClose }) => {
     }
 
     //  after validation create the community wuth firestore
+    // async await seems to be stoping the code from running
+
+    mutate({ communityName, setError, communityType });
   };
   return (
     <>
@@ -79,7 +85,7 @@ const CreateCommunityModal = ({ open, handleClose }) => {
             </Text>
 
             <Text fontSize={12} color="red">
-              {error}
+              {error || queryError?.message}
             </Text>
 
             <Box mb="6">
@@ -144,7 +150,13 @@ const CreateCommunityModal = ({ open, handleClose }) => {
             >
               Close
             </Button>
-            <Button variant="ghost">Create Community</Button>
+            <Button
+              onClick={createCommunityHandler}
+              isLoading={isLoading}
+              variant="ghost"
+            >
+              Create Community
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -202,3 +214,5 @@ const PrivateIcon = () => {
     </svg>
   );
 };
+
+// test react query with firebase function and check what the error returns. theres 2 erros that we need to pay attention two. one where the name already exist we show an error, if the fucntion doesnt make it through another error
