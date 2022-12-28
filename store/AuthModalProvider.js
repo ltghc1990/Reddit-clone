@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useState } from "react";
 
-// might also use react query here
 export const AuthModalContext = createContext();
+// typescript would help visualise what our options can be here, our view can only be "login", "signup" or "resetPassword" but we wouldnt know that without hints/comments
 
 const AuthModalProvider = ({ children }) => {
   const [modalSettings, setModalSettings] = useState({

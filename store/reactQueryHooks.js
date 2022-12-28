@@ -21,7 +21,9 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { doc, setDoc, collection, getDocs } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs, getDoc } from "firebase/firestore";
+
+import { useRouter } from "next/router";
 
 // firebase create email/password
 export const useCreateUserWithEmail = () => {
@@ -146,14 +148,11 @@ export const useOnAuthChange = () => {
   const queryClient = useQueryClient();
   const unsubscribe = onAuthStateChanged(auth, () => {
     queryClient.invalidateQueries(["user"]);
-    console.log("A auth Change has occured");
     // clear the user communities if they signed out
     const user = queryClient.getQueryData(["user"]);
-    const communityData = queryClient.getQueryData(["communitySnippets"]);
 
     if (user === null) {
-      console.log("user is null");
-      queryClient.invalidateQueries(["communitySnippets"]);
+      queryClient.resetQueries(["communitySnippets"]);
     }
   });
 };
@@ -191,8 +190,12 @@ export const useFetchCommunitySnippets = () => {
 
   // have to remove enabled prop since its preventing the function from running again when the user is null, causing the header component to not rerender
 
-  const { data, isLoading, error } = useQuery(["communitySnippets"], () =>
-    getCommunitySnippets()
+  const { data, isLoading, error } = useQuery(
+    ["communitySnippets"],
+    () => getCommunitySnippets(),
+    {
+      enabled: Boolean(user),
+    }
   );
 
   // grab all the communities our user is in
@@ -211,38 +214,46 @@ export const useFetchCommunitySnippets = () => {
   };
 };
 
-export const useOnJoinorLeaveCommunity = (isJoined) => {
+export const useOnJoinorLeaveCommunity = (isJoined, communityData) => {
+  // this is just a regular function that decides which mutation occurs
   const queryClient = useQueryClient();
-  const userData = queryClient.getQueryData(["user"]);
+  const user = queryClient.getQueryData(["user"]);
 
-  // firebase function
-  const firebaseMutation = (isJoined) => {
-    if (isJoined) {
-      // need to do a transaction to remove from users and communities
-    }
+  // determine the firebase callback function
+  const firebaseMutation = isJoined
+    ? () => leaveCommunity(communityData.id, user)
+    : () => joinCommunity(communityData, user);
+  // create react query object
+  const joinOrLeaveMuationQuery = useMutation(firebaseMutation, {
+    onSuccess: (data) => {
+      console.log("joinOrLeaveMutation success, response data:", data);
+      // invalidate querys
+      queryClient.invalidateQueries(["communitySnippets"]);
+      // get the response back from firebase,
+      // instead of invalidating we can grab the community snippets and append the response to it and then manual set the query cache. that way we dont have to wait for an invalidation to update
+    },
+  });
 
-    // make sure that they are loggd in
+  return joinOrLeaveMuationQuery;
+};
+
+export const useCommunityData = () => {
+  const router = useRouter();
+  const { communityId } = router.query;
+
+  const getFirestoreCommunityData = async () => {
+    const communityDocRef = doc(firestore, "communities", communityId);
+    const communityDoc = await getDoc(communityDocRef);
+    return communityDoc.data();
   };
 
-  const { data, isLoading, error, mutate } = useMutation(() => lol());
+  return useQuery(["currentCommunity"], getFirestoreCommunityData, {
+    enabled: Boolean(communityId),
+  });
 };
-
-const useLeaveCommunity = (communityId) => {
-  const { data, isLoading, error, mutate } = useMutation(() =>
-    leaveCommunity(communityId)
-  );
-};
-
-const useJoinCommunity = (communityData) => {
-  const { data, isLoading, error, mutate } = useMutation(() =>
-    joinCommunity(communityData)
-  );
-};
-
-// after mutation must invalidate the communitySnippets key
 
 // query keys
 // ['user] = the user Auth details
-// ['communitySnippets]
-
-// HAVE TO CLEAR THE COMMUNITY SNIPPETS ON LOGOUT
+// ['communitySnippets] = communities that the user is a part of
+// ["currentCommunity"] = the current community that we are viewing
+// ['posts'] = posts from the community that we are currently in

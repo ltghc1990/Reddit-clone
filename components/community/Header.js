@@ -1,18 +1,40 @@
-import React, { useState } from "react";
-import { Box, Flex, Icon, Text, Button } from "@chakra-ui/react";
+import React, { useState, useContext } from "react";
+import { Box, Flex, Icon, Text, Button, Image } from "@chakra-ui/react";
 
 // import RedditFace from "../Layout/Navbar/RedditFace";
-
-import { useFetchCommunitySnippets } from "../../store/reactQueryHooks";
+import { AuthModalContext } from "../../store/AuthmodalProvider";
+import {
+  useUserAuth,
+  useFetchCommunitySnippets,
+  useOnJoinorLeaveCommunity,
+  useCommunityData,
+} from "../../store/reactQueryHooks";
 
 // props coming from serverside
 const Header = ({ communityData }) => {
-  // using global state check if the user is in this community, decide what to show using boolean
-
+  const { setModalSettings } = useContext(AuthModalContext);
+  const { data: user } = useUserAuth();
   const { data: communitySnippets } = useFetchCommunitySnippets();
+
   const isJoined = communitySnippets?.find(
     (item) => item.communityId === communityData.id
   );
+
+  const { data, isLoading, error, mutate } = useOnJoinorLeaveCommunity(
+    isJoined,
+    communityData
+  );
+
+  const { data: currentCommunity, isLoading: currentIsloading } =
+    useCommunityData();
+
+  const onClickHandler = () => {
+    if (!user) {
+      setModalSettings((prev) => ({ ...prev, open: true }));
+      return;
+    }
+    mutate();
+  };
 
   return (
     <>
@@ -20,7 +42,20 @@ const Header = ({ communityData }) => {
       <Flex bg="white" h="20">
         <Flex className="w-[95%] max-w-screen-2xl mx-auto px-4">
           <Flex justify="center" align="center" mt="-6" height="full">
-            {communityData.imageURL ? <image /> : <Icon as={RedditFace} />}
+            <Box
+              maxW="20"
+              maxH="20"
+              overflow="hidden"
+              border="4px"
+              borderRadius="full"
+              borderColor="white"
+            >
+              {currentCommunity?.imageURL ? (
+                <Image src={currentCommunity.imageURL} alt="community image" />
+              ) : (
+                <Icon as={RedditFace} />
+              )}
+            </Box>
           </Flex>
           <Flex mx="4" pt="2">
             <Box mr="4">
@@ -32,11 +67,10 @@ const Header = ({ communityData }) => {
               </Text>
             </Box>
             <Button
-              variant={isJoined && "outline"}
-              color="white"
-              bg="blue.500"
+              // variant="outline"
               _hover={!isJoined && { backgroundColor: "blue.600" }}
-              onClick={() => {}}
+              isLoading={isLoading}
+              onClick={onClickHandler}
             >
               {isJoined ? "Joined" : "Join"}
             </Button>
@@ -51,12 +85,7 @@ export default Header;
 
 const RedditFace = () => {
   return (
-    <svg
-      className="border-4 border-white rounded-full"
-      width="60px"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-    >
+    <svg width="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
       <g>
         <circle fill="#FF4500" cx="10" cy="10" r="10"></circle>
         <path

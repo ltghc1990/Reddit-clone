@@ -5,25 +5,25 @@ import { firestore } from "../../../firebase/clientApp";
 import NotFound from "../../../components/community/NotFound";
 import Header from "../../../components/community/Header";
 import PageContent from "../../../components/Layout/PageContent";
+import CreatePostLink from "../../../components/community/CreatePostLink";
+import Posts from "../../../components/Posts/Posts";
+import About from "../../../components/community/About";
 
 const CommunityPage = ({ communityData }) => {
-  console.log(communityData);
-
   if (!communityData) {
     return <NotFound />;
   }
+
   return (
     <>
       <Header communityData={communityData} />;
       <PageContent>
         <>
-          <div>Hello world 1</div>
-          <div>Hello world 1</div>
-          <div>Hello world 1</div>
-          <div>Hello world 1</div>
-          <div>Hello world 1</div>
+          <CreatePostLink />
+
+          <Posts communityData={communityData} />
         </>
-        <>Hello world 2</>
+        <About communityData={communityData} />
       </PageContent>
     </>
   );
