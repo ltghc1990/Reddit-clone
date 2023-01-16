@@ -108,7 +108,6 @@ export const useUserAuth = () => {
     {
       onSuccess: (data) => {
         // close modal because data exist?
-
         if (data !== null && modalSettings.open === true) {
           setModalSettings((prev) => ({ ...prev, open: false }));
         }
@@ -148,11 +147,13 @@ export const useOnAuthChange = () => {
   const queryClient = useQueryClient();
   const unsubscribe = onAuthStateChanged(auth, () => {
     queryClient.invalidateQueries(["user"]);
-    // clear the user communities if they signed out
     const user = queryClient.getQueryData(["user"]);
 
+    // clear the user communities if they signed out
+    // also clear users postVotes
     if (user === null) {
       queryClient.resetQueries(["communitySnippets"]);
+      queryClient.setQueryData(["userPostVotes"], []);
     }
   });
 };

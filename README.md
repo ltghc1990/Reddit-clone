@@ -14,3 +14,7 @@
 <!-- Things that need fixing -->
 
 - the firebase folder is inside of the components folder.....
+
+<!-- reminders -->
+
+<!-- when we create a post, we need to add the id of the post as a property in firestore -->

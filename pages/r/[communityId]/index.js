@@ -16,7 +16,7 @@ const CommunityPage = ({ communityData }) => {
 
   return (
     <>
-      <Header communityData={communityData} />;
+      <Header communityData={communityData} />
       <PageContent>
         <>
           <CreatePostLink />

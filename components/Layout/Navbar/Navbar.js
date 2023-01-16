@@ -16,6 +16,7 @@ import { useOnAuthChange, useUserAuth } from "../../../store/reactQueryHooks";
 const Navbar = () => {
   useOnAuthChange();
   const { data: user } = useUserAuth();
+
   return (
     <Flex
       className="justify-between outline"

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { auth, firestore, storage } from "./clientApp";
 
 // Alot of the auth firebase functions are in the reactQueryHooks file
@@ -146,26 +147,90 @@ export const uploadCommunityIcon = async ({ communityData, selectedFile }) => {
   });
 };
 
-export const onPostVote = async (
+export const onPostVote = async ({
   post,
   voteValue,
   communityId,
-  userPostVotes,
-  existingVote
-) => {
+  existingVoteValue,
+  user,
+}) => {
   const postRef = doc(firestore, "posts", `${post.id}`);
-  const userPostRef = doc(firestore, "users", `${user.id}/${post.id}`);
+  const userPostRef = doc(firestore, "users", `${user}/postVotes/${post.id}`);
+
   const batch = writeBatch(firestore);
+  // since batch doesnt return a response we need to manually return data to update the cache after mutate. we need to do this to not force a refetch of all posts, and users posteVotes.
+
+  // 2 things that need to be replaced /returned;
+  // the users votevalue in the postValue sub collection
+  // the communitys voteStatus
+
+  let returnObject = {
+    voteObject: {
+      id: post.id,
+      // id: postID
+      // voteValue: 1 / -1  if voteValue doesnt exist we are removing the vote, we return the id inorder to do the filter method for removal
+    },
+    postVoteStatus: post.voteStatus,
+  };
+
+  if (existingVoteValue === null) {
+    // vote value determines if we are downvoting or upvoting
+    const voteObject = {
+      id: post.id,
+      voteValue: voteValue,
+    };
+    const newPostVotestatus = post.voteStatus + voteValue;
+    batch.set(userPostRef, voteObject);
+    batch.update(postRef, { voteStatus: newPostVotestatus });
+    returnObject = {
+      voteObject,
+      postVoteStatus: newPostVotestatus,
+    };
+  } else {
+    if (existingVoteValue === voteValue) {
+      // 1 === 1 or -1 === -1 means that we are removing vote
+      batch.delete(userPostRef);
+
+      const updatedVoteStatus = post.voteStatus - voteValue;
+      batch.update(postRef, { voteStatus: updatedVoteStatus });
+      returnObject = {
+        voteObject: { ...returnObject.voteObject },
+        postVoteStatus: updatedVoteStatus,
+      };
+    } else {
+      // replace existing user vote with the voteValue
+      // flip the vote means that the post vote status goes up by 2 or down by 2
+      batch.update(userPostRef, { voteValue: voteValue });
+      const updatedPostVoteStatus = post.voteStatus + voteValue * 2;
+      batch.update(postRef, { voteStatus: updatedPostVoteStatus });
+      returnObject = {
+        voteObject: { ...returnObject.voteObject, voteValue: voteValue },
+        postVoteStatus: updatedPostVoteStatus,
+      };
+    }
+  }
 
   await batch.commit();
+  return returnObject;
 };
 
+// fetches all the postvotes of the user
+// it would be less taxing if we only pulled the postsvotes from the community that we are in but.. this works for when we are in the "all" community
 export const fetchUserPostVotes = async (user) => {
   // grab all users postvote data?
-  //  have to since we need it visually in order to if they upvoted or not
-
-  const colfRef = collection(firestore, `users/${user.uid}/postVotes`);
+  //  have to since we need it visually in order to show upvoted/downvote css
+  const colfRef = collection(firestore, `users/${user}/postVotes`);
   const postVotesDocs = await getDocs(colfRef);
+  return postVotesDocs.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+};
 
-  return postVotesDocs.docs.map((doc) => ({ ...data.doc, id: doc.id }));
+export const fetchSinglePost = async (id) => {
+  console.log(id);
+  const docRef = doc(firestore, "posts", `${id}`);
+
+  const data = await getDoc(docRef);
+
+  const dataTest = { ...data.data() };
+
+  return dataTest;
 };

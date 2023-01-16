@@ -9,7 +9,11 @@ import PostLoader from "./PostLoader";
 import { useQuery } from "@tanstack/react-query";
 import { useUserAuth } from "../../store/reactQueryHooks";
 
+import { useSelectedContext } from "../../store/SelectedPostProvider";
+
 const Posts = ({ communityData }) => {
+  const { setSelectedPost } = useSelectedContext();
+
   const { data, isLoading, error } = useQuery(["posts"], () =>
     fetchPosts(communityData)
   );
@@ -20,7 +24,7 @@ const Posts = ({ communityData }) => {
 
   const { data: userPostVotes } = useQuery(
     ["userPostVotes"],
-    fetchUserPostVotes,
+    () => fetchUserPostVotes(user.uid),
     {
       enabled: Boolean(user?.uid),
     }
@@ -37,14 +41,13 @@ const Posts = ({ communityData }) => {
               <PostItem
                 key={post.id}
                 post={post}
-                user={user}
+                user={user?.uid}
                 userIsCreator={user?.uid === post.creatorId}
-                userVoteValue={undefined}
-                existingVote={
-                  userPostVotes.find((item) => item.id === post.id) ?? null
+                existingVoteValue={
+                  userPostVotes?.find((item) => item.id === post.id)
+                    ?.voteValue ?? null
                 }
-                // onVote={onVote}
-                // onSelectPost={onSelectPost}
+                setSelectedPost={setSelectedPost}
               />
             );
           })}

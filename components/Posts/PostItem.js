@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import moment from "moment";
 import {
   Flex,
@@ -14,7 +14,6 @@ import {
   AlertIcon,
   AlertDescription,
 } from "@chakra-ui/react";
-
 // icons for the post
 import {
   ArrowUpCircleIcon,
@@ -25,22 +24,41 @@ import {
   DeleteIcon,
 } from "../Icons";
 
-import { onDeletePost } from "../../firebase/firebaseFunctions";
+import { useRouter } from "next/router";
+
+import { onDeletePost, onPostVote } from "../../firebase/firebaseFunctions";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { AuthModalContext } from "../../store/AuthmodalProvider";
 
 const PostItem = ({
   post,
   user,
   userIsCreator,
-  userVoteValue,
-  existingVote,
+  existingVoteValue,
+  setSelectedPost,
 }) => {
-  const [loadingImage, setLoadingImage] = useState(true);
-
+  const { setModalSettings } = useContext(AuthModalContext);
+  const router = useRouter();
   const queryClient = useQueryClient();
 
+  // for styling purposes
+  const singlePostItem = !setSelectedPost;
+
+  const [loadingImage, setLoadingImage] = useState(true);
   const { isLoading, error, mutate } = useMutation(onDeletePost);
+  // voting system
+  const { mutate: postVoteMutate } = useMutation(onPostVote);
+
+  const onSelectPost = () => {
+    if (!setSelectedPost) return;
+    queryClient.setQueryData(["selectedPost"], { ...post });
+    router.push(`${router.asPath}/comments/${post.id}`);
+    //  since we route to a new page the refresh removes all our cache stored in the keys.
+    //  selected post put into a context, take the users postVotes and also put it into state
+    setSelectedPost(post);
+  };
 
   const handleDelete = () => {
     mutate(post, {
@@ -57,13 +75,98 @@ const PostItem = ({
     });
   };
 
-  const handleVote = () => {
+  const handleVote = (voteValue, event) => {
+    event.stopPropagation();
     if (!user) {
       // bring up the modal to login/sign in
+      setModalSettings((prev) => ({ ...prev, open: true }));
       return;
-    }
+    } else {
+      console.log("handlevote");
+      postVoteMutate(
+        { post, voteValue, existingVoteValue, user },
+        {
+          onSuccess: (response) => {
+            console.log("vote mutation successful, response:", response);
+            //  dont want to invalidate as that would cause use to have to refetch all the users postvotes as well as all the posts in the post collection
+            // need to update post voteStatus
+            // need to update users postvotes
+            const postsCache = queryClient.getQueryData(["posts"]);
+            const userPostVotesCache = queryClient.getQueryData([
+              "userPostVotes",
+            ]);
+            // if/else statement, if the voteValue does not exist we are deleting and if it does exist we are adding/replacing
 
-    // check if we have voted before
+            if (!response.voteObject.voteValue) {
+              // remove vote from user + update post voteStatus
+              const updatedPostCache = postsCache.map((post) => {
+                if (post.id === response.voteObject.id) {
+                  return {
+                    ...post,
+                    voteStatus: response.postVoteStatus,
+                  };
+                }
+                return post;
+              });
+              const updatedUserPostVotesCache = userPostVotesCache.filter(
+                (item) => item?.id !== response.voteObject.id ?? []
+              );
+              queryClient.setQueryData(["posts"], updatedPostCache);
+              queryClient.setQueryData(
+                ["userPostVotes"],
+                updatedUserPostVotesCache
+              );
+            } else {
+              // post voteStatus needs to be updated eitherway
+
+              // if the response id does not exist in the cache then we add it to the array instead of updating it with the new vote value
+              const doesItExist = userPostVotesCache.filter(
+                (item) => item.id === response.voteObject.id
+              );
+
+              if (doesItExist.length >= 1) {
+                console.log(doesItExist);
+                const updatedUserPostVotes = userPostVotesCache.map((item) => {
+                  if (item.id === response.voteObject.id) {
+                    return {
+                      ...item,
+                      voteValue: response.voteObject.voteValue,
+                    };
+                  }
+                  return item;
+                });
+
+                queryClient.setQueryData(
+                  ["userPostVotes"],
+                  updatedUserPostVotes
+                );
+              } else {
+                const updatedUserPostVotes = [
+                  ...userPostVotesCache,
+                  { ...response.voteObject },
+                ];
+                queryClient.setQueryData(
+                  ["userPostVotes"],
+                  updatedUserPostVotes
+                );
+              }
+
+              const updatedPost = postsCache.map((post) => {
+                if (post.id === response.voteObject.id) {
+                  return {
+                    ...post,
+                    voteStatus: response.postVoteStatus,
+                  };
+                }
+                return post;
+              });
+
+              queryClient.setQueryData(["posts"], updatedPost);
+            }
+          },
+        }
+      );
+    }
   };
 
   return (
@@ -73,6 +176,7 @@ const PostItem = ({
       borderColor="gray.300"
       cursor="pointer"
       borderRadius="4"
+      onClick={onSelectPost}
     >
       <Flex
         direction="column"
@@ -82,15 +186,15 @@ const PostItem = ({
         flexShrink="0"
       >
         <Box
-          color={userVoteValue === 1 ? "red.500" : "gray.400"}
-          onClick={() => {}}
+          color={existingVoteValue === 1 ? "red.500" : "gray.400"}
+          onClick={(event) => handleVote(1, event)}
         >
           <Icon as={ArrowUpCircleIcon} />
         </Box>
         <Text fontSize="9">{post.voteStatus}</Text>
         <Box
-          color={userVoteValue === 1 ? "#4379ff" : "gray.400"}
-          onClick={() => {}}
+          color={existingVoteValue === -1 ? "#4379ff" : "gray.400"}
+          onClick={(event) => handleVote(-1, event)}
         >
           <Icon as={ArrowDownCircleIcon} />
         </Box>
@@ -106,7 +210,7 @@ const PostItem = ({
           <HStack>
             {/* icon if we are on the home page do not show icon */}
             <Text mt="2">
-              Posted by u/{post.creatorDisplayName}
+              Posted by u/{post.creatorDisplayName}{" "}
               {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
             </Text>
           </HStack>
