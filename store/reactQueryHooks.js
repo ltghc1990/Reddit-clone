@@ -165,14 +165,8 @@ export const useMutationCommunity = () => {
   const userData = queryClient.getQueryData(["user"]);
 
   const { isLoading, error, mutate } = useMutation((data) =>
-    addCommunityName(
-      data.communityName,
-      data.setError,
-      userData.uid,
-      data.communityType
-    )
+    addCommunityName(data.communityName, userData.uid, data.communityType)
   );
-
   return {
     isLoading,
     error,
@@ -189,30 +183,15 @@ export const useFetchCommunitySnippets = () => {
   // need the user auth before we can do anything
   const { data: user } = useUserAuth();
 
-  // have to remove enabled prop since its preventing the function from running again when the user is null, causing the header component to not rerender
-
-  const { data, isLoading, error } = useQuery(
-    ["communitySnippets"],
-    () => getCommunitySnippets(),
-    {
-      enabled: Boolean(user),
-    }
-  );
-
-  // grab all the communities our user is in
+  // firebase function:  grab all the communities our user is in
   const getCommunitySnippets = async () => {
     const colRef = collection(firestore, `users/${user.uid}/communitySnippets`);
     const response = await getDocs(colRef);
-    const communitySnippets = response.docs.map((doc) => {
-      return { ...doc.data() };
-    });
-    return communitySnippets;
+    return response.docs.map((doc) => ({ ...doc.data() }));
   };
-  return {
-    data,
-    isLoading,
-    error,
-  };
+  return useQuery(["communitySnippets"], () => getCommunitySnippets(), {
+    enabled: Boolean(user),
+  });
 };
 
 export const useOnJoinorLeaveCommunity = (isJoined, communityData) => {
@@ -238,23 +217,36 @@ export const useOnJoinorLeaveCommunity = (isJoined, communityData) => {
   return joinOrLeaveMuationQuery;
 };
 
-export const useCommunityData = () => {
+export const useCommunityData = (initialData) => {
+  // if no community id, means we are on the home page.
+
   const router = useRouter();
   const { communityId } = router.query;
 
   const getFirestoreCommunityData = async () => {
     const communityDocRef = doc(firestore, "communities", communityId);
     const communityDoc = await getDoc(communityDocRef);
-    return communityDoc.data();
+    return { ...communityDoc.data(), id: communityDoc.id };
   };
 
   return useQuery(["currentCommunity"], getFirestoreCommunityData, {
     enabled: Boolean(communityId),
+    initialData: initialData,
   });
 };
 
 // query keys
 // ['user] = the user Auth details
-// ['communitySnippets] = communities that the user is a part of
+// ['communitySnippets] = communities that the user has joined
 // ["currentCommunity"] = the current community that we are viewing
 // ['posts'] = posts from the community that we are currently in
+// ['posts, [...slug]'] the individual post
+// ['userPostVotes'] the users post votes, needed to show the users upvotes/downvotes
+// ['comments] = all the comments made for the individial post
+
+export const getFirestoreCommunityData = async (communityId) => {
+  const communityDocRef = doc(firestore, "communities", communityId);
+  const communityDoc = await getDoc(communityDocRef);
+
+  return { ...communityDoc.data(), id: communityDoc.id };
+};

@@ -19,6 +19,7 @@ import {
   where,
   orderBy,
   updateDoc,
+  limit,
 } from "firebase/firestore";
 
 import {
@@ -31,7 +32,6 @@ import {
 // not really reusable, we are passing props instead of just having the function in the component itself; mainly becuase I like to keep my functions separate from the component
 export const addCommunityName = async (
   communityName,
-  error,
   userUid,
   communityType
 ) => {
@@ -73,6 +73,7 @@ export const joinCommunity = async (communityData, user) => {
   const newSnippet = {
     communityId: communityData.id,
     imageURL: communityData.imageURL || "",
+    isModerator: user?.uid === communityData.creatorId,
   };
 
   // add the snippet to our user and also increment the community
@@ -134,7 +135,25 @@ export const onDeletePost = async (post) => {
   await deleteDoc(postDocRef);
 };
 
-export const uploadCommunityIcon = async ({ communityData, selectedFile }) => {
+// export const uploadCommunityIcon = async ({ communityData, selectedFile }) => {
+//   const imageRef = ref(storage, `communities/${communityData.id}/image`);
+//   await uploadString(imageRef, selectedFile, "data_url");
+
+//   const downloadURL = await getDownloadURL(imageRef);
+
+//   const communityDocRef = doc(firestore, "communities", communityData.id);
+
+//   await updateDoc(communityDocRef, {
+//     imageURL: downloadURL,
+//   });
+// };
+
+export const uploadCommunityIcon = async ({
+  communityData,
+  selectedFile,
+  userId,
+}) => {
+  const batch = writeBatch(firestore);
   const imageRef = ref(storage, `communities/${communityData.id}/image`);
   await uploadString(imageRef, selectedFile, "data_url");
 
@@ -142,9 +161,20 @@ export const uploadCommunityIcon = async ({ communityData, selectedFile }) => {
 
   const communityDocRef = doc(firestore, "communities", communityData.id);
 
-  await updateDoc(communityDocRef, {
+  batch.update(communityDocRef, {
     imageURL: downloadURL,
   });
+
+  const userSnippetsdocRef = doc(
+    firestore,
+    "users",
+    userId,
+    "communitySnippets",
+    communityData.id
+  );
+
+  batch.update(userSnippetsdocRef, { imageURL: downloadURL });
+  await batch.commit();
 };
 
 export const onPostVote = async ({
@@ -161,7 +191,7 @@ export const onPostVote = async ({
   // since batch doesnt return a response we need to manually return data to update the cache after mutate. we need to do this to not force a refetch of all posts, and users posteVotes.
 
   // 2 things that need to be replaced /returned;
-  // the users votevalue in the postValue sub collection
+  // the users votevalue in the postValues sub collection
   // the communitys voteStatus
 
   let returnObject = {
@@ -225,12 +255,81 @@ export const fetchUserPostVotes = async (user) => {
 };
 
 export const fetchSinglePost = async (id) => {
-  console.log(id);
   const docRef = doc(firestore, "posts", `${id}`);
-
   const data = await getDoc(docRef);
+  return [{ ...data.data() }];
+};
 
-  const dataTest = { ...data.data() };
+// comments have a prop of the post id
 
-  return dataTest;
+// fetch all comments from the "comments" collection where the field "postId" matches the id of the post
+export const fetchComments = async (collectionArg, field, id) => {
+  // need to have an extra arg to toggle orderBy list
+  const colRef = collection(firestore, collectionArg);
+
+  const commentsQuery = query(
+    colRef,
+    where(field, "==", id),
+    orderBy("createdAt", "desc")
+  );
+  const commentDocs = await getDocs(commentsQuery);
+
+  return commentDocs.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+// needs to be a batch write since we also have to update the post doc.
+// the prop key numberofComments has to be updated
+export const createComment = async ({
+  selectedPost,
+  comment,
+  communityId,
+  user,
+}) => {
+  const batch = writeBatch(firestore);
+
+  const commentRef = doc(collection(firestore, "comments"));
+
+  batch.set(commentRef, {
+    id: commentRef.id,
+    creatorId: user.uid,
+    creatorDisplayText: user.email.split("@")[0],
+    communityId,
+    postId: selectedPost.id,
+    postTitle: selectedPost.title,
+    text: comment,
+    createdAt: serverTimestamp(),
+  });
+
+  const postRef = doc(firestore, "posts", selectedPost.id);
+  batch.update(postRef, {
+    numberOfComments: increment(+1),
+  });
+
+  await batch.commit();
+  return (await getDoc(commentRef)).data();
+};
+
+export const deleteComment = async ({ id, postId }) => {
+  // need to also grab the post and lower the comments count
+  const commentRef = doc(firestore, "comments", id);
+  const postRef = doc(firestore, "posts", postId);
+
+  const batch = writeBatch(firestore);
+  batch.delete(commentRef);
+  batch.update(postRef, { numberOfComments: increment(-1) });
+
+  await batch.commit();
+  return id;
+};
+
+// fetch the top 10 most voted posts
+
+export const fetchPopularPosts = async () => {
+  const colRef = collection(firestore, "posts");
+  const postQuery = query(colRef, orderBy("voteStatus", "desc"), limit(10));
+  const postDocs = await getDocs(postQuery);
+
+  const data = postDocs.docs.map((doc) => ({ ...doc.data() }));
+  console.log(data);
+  return data;
 };

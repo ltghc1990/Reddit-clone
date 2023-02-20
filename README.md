@@ -18,3 +18,5 @@
 <!-- reminders -->
 
 <!-- when we create a post, we need to add the id of the post as a property in firestore -->
+
+<!-- need to know when we do a manual setQueryData on a single post item; when i go back will the react query change too? I think it does because it might count as a refresh -->

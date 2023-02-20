@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Button,
   Text,
@@ -7,19 +5,31 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
-  MenuDivider,
   Icon,
+  Image,
+  Box,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import RedditFace from "../RedditFace";
 
 import Communities from "./Communities";
 
+import { useCommunityMenu } from "../../../../store/OpenCommunityMenuP";
+import { useCommunityData } from "../../../../store/reactQueryHooks";
+
 const Directory = () => {
+  const { isOpen, toggleCommunityMenu } = useCommunityMenu();
+
+  const { data: currentCommunity } = useCommunityData({
+    id: "Home",
+    imageURL: HouseIcon,
+  });
+
   return (
-    <div>
-      <Menu>
+    <Box onClick={(e) => e.stopPropagation()}>
+      <Menu isOpen={isOpen}>
         <MenuButton
+          onClick={toggleCommunityMenu}
           as={Button}
           bgColor="white"
           borderRadius={6}
@@ -28,15 +38,33 @@ const Directory = () => {
           rightIcon={<ChevronDownIcon />}
         >
           <Flex align="center">
-            <Icon as={HouseIcon} mr={{ base: 0, md: 2 }} />
-            <Text display={{ base: "none", md: "block" }}>Home</Text>
+            {currentCommunity?.imageURL ? (
+              <Box boxSize={6} mr={{ base: 0, md: 2 }}>
+                {currentCommunity.id == "Home" ? (
+                  <Icon as={HouseIcon} />
+                ) : (
+                  <Image
+                    src={currentCommunity.imageURL}
+                    alt={currentCommunity.id}
+                  />
+                )}
+              </Box>
+            ) : (
+              <Box mr={{ base: 0, md: "2" }}>
+                <Icon as={() => RedditFace({ size: "24px" })} />
+              </Box>
+            )}
+
+            <Text display={{ base: "none", md: "block" }}>
+              {currentCommunity && currentCommunity.id}
+            </Text>
           </Flex>
         </MenuButton>
         <MenuList>
           <Communities />
         </MenuList>
       </Menu>
-    </div>
+    </Box>
   );
 };
 

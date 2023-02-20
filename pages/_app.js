@@ -5,24 +5,27 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { Layout } from "../components/Layout/Layout";
 import AuthModalProvider from "../store/AuthmodalProvider";
-import SelectedPostProvider from "../store/SelectedPostProvider";
+import OpenCommunityMenuP from "../store/OpenCommunityMenuP";
+
+import { useRouter } from "next/router";
 
 // take extended theme and give it to the chakra provider
 import { theme } from "../chakra/theme";
 
 function MyApp({ Component, pageProps }) {
   const queryClient = new QueryClient();
+  const router = useRouter();
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthModalProvider>
         <ChakraProvider theme={theme}>
-          <Layout>
-            <SelectedPostProvider>
+          <OpenCommunityMenuP>
+            <Layout key={router.asPath}>
               <Component {...pageProps} />
-            </SelectedPostProvider>
-
-            <ReactQueryDevtools />
-          </Layout>
+              <ReactQueryDevtools />
+            </Layout>
+          </OpenCommunityMenuP>
         </ChakraProvider>
       </AuthModalProvider>
     </QueryClientProvider>

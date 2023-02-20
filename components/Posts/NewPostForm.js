@@ -23,6 +23,8 @@ import {
   collection,
   addDoc,
   updateDoc,
+  doc,
+  setDoc,
 } from "firebase/firestore";
 
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
@@ -33,7 +35,6 @@ import { useSelectFile } from "../../store/useSelectFile";
 import ImageUpload from "./PostForm/ImageUpload";
 import TextInputs from "./PostForm/TextInputs";
 
-// static, doesnt change when props change so its always the same
 const formTabs = [
   { title: "Post", icon: DocumentIcon },
   { title: "Photo", icon: PhotoIcon },
@@ -43,7 +44,7 @@ const formTabs = [
 ];
 
 // the state from the tab lives here
-const NewPostForm = () => {
+const NewPostForm = ({ communityImageURL }) => {
   const { data: user } = useUserAuth();
   const router = useRouter();
 
@@ -72,6 +73,7 @@ const NewPostForm = () => {
 
     const newPost = {
       creatorId: userId,
+      communityImageURL: communityImageURL || "",
       communityId,
       creatorDisplayName: user?.email?.split("@")[0],
       title: textInputs.title,
@@ -82,10 +84,12 @@ const NewPostForm = () => {
     };
     // send object to reactQuery mutation
     mutate(newPost, {
+      onError: (error) => console.log(error),
       onSuccess: async (response) => {
         // firebase returns the docRef as a response
         console.log(
-          "successfully added new post to firebase collection posts."
+          "successfully added new post to firebase collection posts.",
+          response
         );
         if (selectedFile) {
           // second param is the path in which we want to store our image
@@ -167,11 +171,15 @@ const NewPostForm = () => {
 
 export default NewPostForm;
 
+// this should really be moved to firebaseFunction or reactQueryHooks
 const UseCreateNewPostMutation = () => {
-  // place newPost object in posts collection
   const firebaseMutation = async (post) => {
-    const postDocRef = await addDoc(collection(firestore, "posts"), post);
-    return postDocRef;
+    const docRef = doc(collection(firestore, "posts"));
+    await setDoc(docRef, {
+      ...post,
+      id: docRef.id,
+    });
+    return docRef;
   };
 
   const queryObject = useMutation(firebaseMutation);

@@ -52,7 +52,15 @@ const CreateCommunityModal = ({ open, handleClose }) => {
     //  after validation create the community wuth firestore
     // async await seems to be stoping the code from running
 
-    mutate({ communityName, setError, communityType });
+    mutate(
+      { communityName, communityType },
+      {
+        onError: (error) => {
+          console.log(error);
+          setError(error.message);
+        },
+      }
+    );
   };
   return (
     <>
@@ -214,5 +222,3 @@ const PrivateIcon = () => {
     </svg>
   );
 };
-
-// test react query with firebase function and check what the error returns. theres 2 erros that we need to pay attention two. one where the name already exist we show an error, if the fucntion doesnt make it through another error

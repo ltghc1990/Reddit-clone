@@ -1,4 +1,5 @@
 import { Box } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 // logos and stuff
 import RedditFace from "./RedditFace";
@@ -14,8 +15,14 @@ import Directory from "./Directory/Directory";
 import { useOnAuthChange, useUserAuth } from "../../../store/reactQueryHooks";
 
 const Navbar = () => {
+  const router = useRouter();
   useOnAuthChange();
   const { data: user } = useUserAuth();
+
+  const onClickHandler = () => {
+    // ideally when we click a link its a hard refresh and we dont have to invalidate react query stuff but some weird stuff is conflicting with router/Link js and reactjs
+    // here we need to invalidate the community and its post
+  };
 
   return (
     <Flex
@@ -26,7 +33,13 @@ const Navbar = () => {
       py="6"
       align={"center"}
     >
-      <HStack align={"center"} space="4" mr={4}>
+      <HStack
+        align={"center"}
+        space="4"
+        mr={4}
+        cursor="pointer"
+        onClick={() => router.push("/")}
+      >
         <RedditFace />
         <Box display={{ base: "none", md: "unset" }}>
           <RedditLogo />

@@ -11,22 +11,22 @@ import {
 } from "../../store/reactQueryHooks";
 
 // props coming from serverside
-const Header = ({ communityData }) => {
+const Header = ({ communityData: initialCommunityData }) => {
   const { setModalSettings } = useContext(AuthModalContext);
   const { data: user } = useUserAuth();
   const { data: communitySnippets } = useFetchCommunitySnippets();
 
+  const { data: currentCommunity, isLoading: currentIsloading } =
+    useCommunityData(initialCommunityData);
+
   const isJoined = communitySnippets?.find(
-    (item) => item.communityId === communityData.id
+    (item) => item.communityId === currentCommunity?.id
   );
 
   const { data, isLoading, error, mutate } = useOnJoinorLeaveCommunity(
     isJoined,
-    communityData
+    currentCommunity
   );
-
-  const { data: currentCommunity, isLoading: currentIsloading } =
-    useCommunityData();
 
   const onClickHandler = () => {
     if (!user) {
@@ -60,10 +60,10 @@ const Header = ({ communityData }) => {
           <Flex mx="4" pt="2">
             <Box mr="4">
               <Text fontWeight="800" fontSize="22px">
-                {communityData.id}
+                {currentCommunity?.id}
               </Text>
               <Text className="text-xs" color="gray.500">
-                r/{communityData.id}
+                r/{currentCommunity?.id}
               </Text>
             </Box>
             <Button

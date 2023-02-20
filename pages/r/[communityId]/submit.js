@@ -5,6 +5,7 @@ import { useCommunityData } from "../../../store/reactQueryHooks";
 
 import PageContent from "../../../components/Layout/PageContent";
 import NewPostForm from "../../../components/Posts/NewPostForm";
+import About from "../../../components/community/About";
 
 const SubmitPostPage = () => {
   const { data, isLoading, error } = useCommunityData();
@@ -21,9 +22,11 @@ const SubmitPostPage = () => {
             Create a Post
           </Text>
         </Box>
-        <NewPostForm />
+        <NewPostForm communityImageURL={data?.imageURL} />
       </>
-      <></>
+      <>
+        <About />
+      </>
     </PageContent>
   );
 };

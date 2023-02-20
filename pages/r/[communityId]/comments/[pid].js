@@ -1,6 +1,8 @@
-import { Text } from "@chakra-ui/react";
 import PageContent from "../../../../components/Layout/PageContent";
-import PostItem from "../../../../components/Posts/PostItem";
+import About from "../../../../components/community/About";
+import SinglePostItemView from "../../../../components/Posts/SinglePostItemView";
+import CommentInput from "../../../../components/Posts/Comments/CommentInput";
+import Comments from "../../../../components/Posts/Comments/Comments";
 
 import { useRouter } from "next/router";
 
@@ -11,50 +13,85 @@ import {
 // query
 import { useUserAuth } from "../../../../store/reactQueryHooks";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useSelectedContext } from "../../../../store/SelectedPostProvider";
 
-// when we click on a post item its going to route to a different page so props arent passed. basically its going to be a new page and we have to pull data again unless it lives in top level state
-
-// problem where when we refresh the props get removed from state
-
-// on refetch need to fetch user, userspostVotes,the post itself
+// on refresh need to fetch user, userspostVotes, the post itself
 const PostPage = () => {
-  const { selectedPost } = useSelectedContext();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const routerPostId = router.query.pid;
 
+  const selectedPost = queryClient.getQueryData(["posts", routerPostId]);
+  // selectedPost is a single object inside a array; Its to maintain the array methods inside postitem. for example the vote function expects an array
+  // const { selectedPost } = useSelectedContext();
+
   const { data: user } = useUserAuth();
-  console.log(user);
 
   const { data: singlePost, isLoading } = useQuery(
-    ["post", `${routerPostId}`],
+    ["posts", `${routerPostId}`],
     () => fetchSinglePost(routerPostId),
     {
       // only run once the router has data, if we receive props thats the initial data
       enabled: Boolean(router),
-      initialData: selectedPost,
+      initialData: selectedPost && [{ ...selectedPost }],
     }
   );
+
+  const { data: userPostVotes } = useQuery(
+    ["userPostVotes"],
+    () => fetchUserPostVotes(user.uid),
+    {
+      enabled: Boolean(user),
+    }
+  );
+
+  // testing out composition structure for comments component
 
   return (
     <div>
       <PageContent>
         {!isLoading && (
           <>
-            {
-              <PostItem
-                post={singlePost}
-                user={user?.uid}
-                userIsCreator={user?.uid === singlePost.creatorId}
-                // existingVoteValue={}
+            {singlePost.map((post) => {
+              return (
+                <SinglePostItemView
+                  key={post.id}
+                  post={post}
+                  user={user?.uid}
+                  userIsCreator={user?.uid === singlePost[0]?.creatorId}
+                  existingVoteValue={
+                    userPostVotes?.find((item) => item.id === post?.id)
+                      ?.voteValue ?? null
+                  }
+                />
+              );
+            })}
+
+            <Comments postId={routerPostId} user={user}>
+              <CommentInput
+                // required info to create the comment
+                user={user}
+                communityId={router?.query?.communityId}
+                selectedPost={singlePost[0]}
               />
-            }
+            </Comments>
           </>
         )}
-        <></>
+        <>
+          <About />
+        </>
       </PageContent>
     </div>
   );
 };
 
 export default PostPage;
+
+export async function getServerSideProps(context) {
+  const queryId = context.query;
+
+  return {
+    props: {
+      // queryId,
+    },
+  };
+}

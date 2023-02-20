@@ -31,7 +31,7 @@ const CommunityPage = ({ communityData }) => {
 
 export default CommunityPage;
 
-// get community data from firebase
+// get community data from firebase, will serve as initial props for react query
 export async function getServerSideProps(context) {
   // grab the query param from the context
   try {

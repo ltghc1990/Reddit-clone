@@ -9,13 +9,17 @@ import PostLoader from "./PostLoader";
 import { useQuery } from "@tanstack/react-query";
 import { useUserAuth } from "../../store/reactQueryHooks";
 
-import { useSelectedContext } from "../../store/SelectedPostProvider";
+//  Post needs the curent community id to fetch posts
+// the only way we get serverside communityData is if we are on the /r/[communityid] page.
+//  the fix is to have a if statement where if communitydata is empty we use the router instead
 
 const Posts = ({ communityData }) => {
-  const { setSelectedPost } = useSelectedContext();
-
-  const { data, isLoading, error } = useQuery(["posts"], () =>
-    fetchPosts(communityData)
+  const { data, isLoading, error } = useQuery(
+    ["posts"],
+    () => fetchPosts(communityData),
+    {
+      enabled: Boolean(communityData),
+    }
   );
 
   // need to know if the user created the post by matching id
@@ -47,7 +51,6 @@ const Posts = ({ communityData }) => {
                   userPostVotes?.find((item) => item.id === post.id)
                     ?.voteValue ?? null
                 }
-                setSelectedPost={setSelectedPost}
               />
             );
           })}

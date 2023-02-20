@@ -21,27 +21,42 @@ import { useUserAuth } from "../../store/reactQueryHooks";
 import { useSelectFile } from "../../store/useSelectFile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const About = ({ communityData }) => {
+import { useCommunityData } from "../../store/reactQueryHooks";
+
+// About component may render with props.
+// no props on refresh so ....
+const About = (props) => {
   const queryClient = useQueryClient();
   const selectedFileRef = useRef();
   const { data: user } = useUserAuth();
   const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const { data, isLoading, error, mutate } = useMutation(uploadCommunityIcon);
 
+  const { data: communityData, communityDataIsLoading } = useCommunityData(
+    props.communityData
+  );
+
   const onUpdateImage = () => {
     if (!selectedFile) {
       return;
     }
     mutate(
-      { communityData, selectedFile },
+      { communityData, selectedFile, userId: user.uid },
       {
+        onError: (error) => console.log(error),
         onSuccess: () => {
           // invalid query key or manual add the response to the query key
           queryClient.invalidateQueries(["currentCommunity"]);
+          // update our array of communities so we can see the icon in our drop down
+          queryClient.invalidateQueries(["communitySnippets"]);
         },
       }
     );
   };
+
+  if (communityDataIsLoading) {
+    return <></>;
+  }
 
   return (
     <Box position="sticky">
@@ -76,7 +91,7 @@ const About = ({ communityData }) => {
             )}
           </Text>
         </Flex>
-        <Link href={`/r/${communityData.id}/submit`}>
+        <Link href={`/r/${communityData?.id}/submit`}>
           <Button mt="3">Create Post</Button>
         </Link>
         {user?.uid === communityData?.creatorId && (
