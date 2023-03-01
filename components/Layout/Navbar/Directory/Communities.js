@@ -16,7 +16,7 @@ import {
   getFirestoreCommunityData,
 } from "../../../../store/reactQueryHooks";
 import { fetchPosts } from "../../../../firebase/firebaseFunctions";
-import { useCommunityMenu } from "../../../../store/OpenCommunityMenuP";
+import { useCommunityMenu } from "../../../../store/CommunityMenuProvider";
 
 const Communities = () => {
   const { toggleCommunityMenu } = useCommunityMenu();

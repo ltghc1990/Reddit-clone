@@ -11,7 +11,7 @@ const PageContent = ({ children }) => {
       <Flex className="w-full " py="4" px="4">
         <Flex
           direction="column"
-          width={{ base: "100%", md: "65%" }}
+          width={{ base: "100%", md: "65%", lg: "70%" }}
           mr={{ base: 0, md: "6" }}
         >
           {children[0]}
@@ -19,6 +19,7 @@ const PageContent = ({ children }) => {
         <Flex
           direction="column"
           display={{ base: "none", md: "flex" }}
+          maxW="30%"
           flexGrow="1"
         >
           {children[1]}

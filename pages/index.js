@@ -6,15 +6,20 @@ import CreatePostLink from "../components/community/CreatePostLink";
 import PageContent from "../components/Layout/PageContent";
 import PostLoader from "../components/Posts/PostLoader";
 import PostItem from "../components/Posts/PostItem";
+import Reccomendations from "../components/community/Reccomendations";
 
 // functions
 import { fetchUserPostVotes } from "../firebase/firebaseFunctions";
 import { useUserAuth } from "../store/reactQueryHooks";
-import { fetchPopularPosts } from "../firebase/firebaseFunctions";
+import {
+  fetchPopularPosts,
+  fetchUserHomeFeed,
+} from "../firebase/firebaseFunctions";
 
 export default function Home(props) {
-  console.log(props);
   const { data: user, isLoading: loadingUser } = useUserAuth();
+
+  let fetchFunction = null;
 
   // 2 different data scenarios
   // one where the user is logged in, one without
@@ -22,20 +27,16 @@ export default function Home(props) {
   // this isUserLoggedIn function might not be nessary
 
   // const IsUserLoggedIn = loadingUser === false && user;
-  const fetchFunction = user ? () => {} : fetchPopularPosts;
-  console.log(fetchFunction);
-
-  // const { data: homePagePosts, isLoading: loadingPosts } = useQuery(
-  //   ["posts"],
-  //   fetchFunction,
-  //   {
-  //     enabled: Boolean(fetchFunction),
-  //   }
-  // );
 
   const { data: homePagePosts, isLoading: loadingPosts } = useQuery(
     ["posts"],
-    fetchPopularPosts
+    user ? () => fetchUserHomeFeed(user.uid) : fetchPopularPosts,
+
+    fetchFunction,
+    {
+      enabled: !loadingUser ? true : null,
+      onSuccess: (response) => {},
+    }
   );
 
   const { data: userPostVotes } = useQuery(
@@ -72,7 +73,9 @@ export default function Home(props) {
           </Stack>
         )}
       </>
-      <></>
+      <>
+        <Reccomendations />
+      </>
     </PageContent>
   );
 }

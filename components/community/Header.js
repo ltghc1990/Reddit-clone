@@ -23,17 +23,14 @@ const Header = ({ communityData: initialCommunityData }) => {
     (item) => item.communityId === currentCommunity?.id
   );
 
-  const { data, isLoading, error, mutate } = useOnJoinorLeaveCommunity(
-    isJoined,
-    currentCommunity
-  );
+  const { isLoading, mutate } = useOnJoinorLeaveCommunity();
 
   const onClickHandler = () => {
     if (!user) {
       setModalSettings((prev) => ({ ...prev, open: true }));
       return;
     }
-    mutate();
+    mutate({ isJoined, item: currentCommunity });
   };
 
   return (

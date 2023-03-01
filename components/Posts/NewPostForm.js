@@ -29,7 +29,10 @@ import {
 
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useMutation } from "@tanstack/react-query";
-import { useUserAuth } from "../../store/reactQueryHooks";
+import {
+  useUserAuth,
+  UseCreateNewPostMutation,
+} from "../../store/reactQueryHooks";
 import { useSelectFile } from "../../store/useSelectFile";
 
 import ImageUpload from "./PostForm/ImageUpload";
@@ -170,18 +173,3 @@ const NewPostForm = ({ communityImageURL }) => {
 };
 
 export default NewPostForm;
-
-// this should really be moved to firebaseFunction or reactQueryHooks
-const UseCreateNewPostMutation = () => {
-  const firebaseMutation = async (post) => {
-    const docRef = doc(collection(firestore, "posts"));
-    await setDoc(docRef, {
-      ...post,
-      id: docRef.id,
-    });
-    return docRef;
-  };
-
-  const queryObject = useMutation(firebaseMutation);
-  return queryObject;
-};

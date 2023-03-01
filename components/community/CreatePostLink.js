@@ -2,13 +2,13 @@ import React, { useContext } from "react";
 import RedditFace from "../Layout/Navbar/RedditFace";
 
 import { AuthModalContext } from "../../store/AuthmodalProvider";
-import { useCommunityMenu } from "../../store/OpenCommunityMenuP";
+import { useCommunityMenu } from "../../store/CommunityMenuProvider";
 import { Flex, Icon, Input, HStack, Box } from "@chakra-ui/react";
 import { useUserAuth } from "../../store/reactQueryHooks";
 import { useRouter } from "next/router";
 
 const CreatePostLink = () => {
-  const { toggleCommunityMenu, isOpen } = useCommunityMenu();
+  const { isOpen, setIsOpen, toggleCommunityMenu } = useCommunityMenu();
   const { setModalSettings } = useContext(AuthModalContext);
 
   const { data: user } = useUserAuth();
@@ -17,7 +17,6 @@ const CreatePostLink = () => {
   const { communityId } = router.query;
 
   const onInputClick = (e) => {
-    e.stopPropagation();
     // need to check if we are in a community
     if (!user) {
       setModalSettings({ open: true, view: "login" });
@@ -25,10 +24,8 @@ const CreatePostLink = () => {
     }
 
     if (!communityId) {
-      toggleCommunityMenu();
       e.target.blur();
-
-      console.log(isOpen);
+      toggleCommunityMenu();
       return;
     }
     router.push(`${communityId}/submit`);

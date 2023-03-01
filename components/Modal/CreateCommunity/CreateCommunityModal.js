@@ -18,9 +18,13 @@ import {
 } from "@chakra-ui/react";
 
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { useMutationCommunity } from "../../../store/reactQueryHooks";
+import { useCommunityMenu } from "../../../store/CommunityMenuProvider";
 
 const CreateCommunityModal = ({ open, handleClose }) => {
+  const router = useRouter();
+  const { setIsOpen } = useCommunityMenu();
   const [communityName, setCommunityName] = useState("");
   const [charsRemaining, setCharsRemaining] = useState(21);
   const [communityType, setCommunityType] = useState("public");
@@ -58,6 +62,10 @@ const CreateCommunityModal = ({ open, handleClose }) => {
         onError: (error) => {
           console.log(error);
           setError(error.message);
+        },
+        onSuccess: () => {
+          router.push(`/r/${communityName}`);
+          setIsOpen(false);
         },
       }
     );

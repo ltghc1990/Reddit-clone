@@ -14,19 +14,25 @@ import RedditFace from "../RedditFace";
 
 import Communities from "./Communities";
 
-import { useCommunityMenu } from "../../../../store/OpenCommunityMenuP";
+import { useCommunityMenu } from "../../../../store/CommunityMenuProvider";
 import { useCommunityData } from "../../../../store/reactQueryHooks";
 
 const Directory = () => {
-  const { isOpen, toggleCommunityMenu } = useCommunityMenu();
+  const { isOpen, setIsOpen, toggleCommunityMenu, closeMenu, buttonRef } =
+    useCommunityMenu();
 
   const { data: currentCommunity } = useCommunityData({
     id: "Home",
     imageURL: HouseIcon,
   });
 
+  const test = (e) => {
+    console.log("onClose triggered");
+  };
+
+  // maybe have button ref, that
   return (
-    <Box onClick={(e) => e.stopPropagation()}>
+    <Box>
       <Menu isOpen={isOpen}>
         <MenuButton
           onClick={toggleCommunityMenu}

@@ -1,31 +1,36 @@
-import { useRef } from "react";
 import {
   Box,
-  Flex,
-  Text,
-  Icon,
-  Stack,
-  Divider,
   Button,
+  Divider,
+  Flex,
+  Icon,
   Image,
-  Spinner,
   Input,
+  Spinner,
+  Stack,
+  Text,
 } from "@chakra-ui/react";
-import RedditFace from "../Layout/Navbar/RedditFace";
-import { TripleDotsHorizontal, CakeIcon } from "../Icons";
 import moment from "moment";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useContext, useRef } from "react";
+import { CakeIcon, TripleDotsHorizontal } from "../Icons";
+import RedditFace from "../Layout/Navbar/RedditFace";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadCommunityIcon } from "../../firebase/firebaseFunctions";
 import { useUserAuth } from "../../store/reactQueryHooks";
 import { useSelectFile } from "../../store/useSelectFile";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { AuthModalContext } from "../../store/AuthmodalProvider";
 import { useCommunityData } from "../../store/reactQueryHooks";
 
 // About component may render with props.
 // no props on refresh so ....
 const About = (props) => {
+  const { modalSettings, setModalSettings } = useContext(AuthModalContext);
+  const router = useRouter();
+
   const queryClient = useQueryClient();
   const selectedFileRef = useRef();
   const { data: user } = useUserAuth();
@@ -35,6 +40,14 @@ const About = (props) => {
   const { data: communityData, communityDataIsLoading } = useCommunityData(
     props.communityData
   );
+
+  const handleCreatePost = () => {
+    if (!user) {
+      setModalSettings((prev) => ({ ...prev, open: true, view: "login" }));
+      return;
+    }
+    router.push(`/r/${communityData?.id}/submit`);
+  };
 
   const onUpdateImage = () => {
     if (!selectedFile) {
@@ -91,9 +104,11 @@ const About = (props) => {
             )}
           </Text>
         </Flex>
-        <Link href={`/r/${communityData?.id}/submit`}>
-          <Button mt="3">Create Post</Button>
-        </Link>
+        {/* <Link href={`/r/${communityData?.id}/submit`}> */}
+        <Button onClick={handleCreatePost} mt="3">
+          Create Post
+        </Button>
+        {/* </Link> */}
         {user?.uid === communityData?.creatorId && (
           <>
             <Divider />

@@ -1,18 +1,33 @@
-import React, { useState, useContext, createContext } from "react";
+import React, {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  useRef,
+} from "react";
 
 const CommunityMenuContext = createContext();
 // This only exist because I need to open the community menu, which is in the nav, from a component futher down.
 
-const OpenCommunityMenuP = ({ children }) => {
+const CommunityMenuProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleCommunityMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
   return (
     <CommunityMenuContext.Provider
-      value={{ isOpen, setIsOpen, toggleCommunityMenu }}
+      value={{
+        isOpen,
+        setIsOpen,
+        toggleCommunityMenu,
+        closeMenu,
+      }}
     >
       {children}
     </CommunityMenuContext.Provider>
@@ -23,7 +38,7 @@ export const useCommunityMenu = () => {
   return useContext(CommunityMenuContext);
 };
 
-export default OpenCommunityMenuP;
+export default CommunityMenuProvider;
 
 // PROBLEM
 // This think remains open if we click outside of it..

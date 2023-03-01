@@ -5,7 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { Layout } from "../components/Layout/Layout";
 import AuthModalProvider from "../store/AuthmodalProvider";
-import OpenCommunityMenuP from "../store/OpenCommunityMenuP";
+import CommunityMenuProvider from "../store/CommunityMenuProvider";
 
 import { useRouter } from "next/router";
 
@@ -20,12 +20,12 @@ function MyApp({ Component, pageProps }) {
     <QueryClientProvider client={queryClient}>
       <AuthModalProvider>
         <ChakraProvider theme={theme}>
-          <OpenCommunityMenuP>
+          <CommunityMenuProvider>
             <Layout key={router.asPath}>
               <Component {...pageProps} />
               <ReactQueryDevtools />
             </Layout>
-          </OpenCommunityMenuP>
+          </CommunityMenuProvider>
         </ChakraProvider>
       </AuthModalProvider>
     </QueryClientProvider>

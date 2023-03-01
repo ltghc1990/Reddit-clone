@@ -194,27 +194,26 @@ export const useFetchCommunitySnippets = () => {
   });
 };
 
-export const useOnJoinorLeaveCommunity = (isJoined, communityData) => {
-  // this is just a regular function that decides which mutation occurs
+export const useOnJoinorLeaveCommunity = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["user"]);
+  // helper function to decide what firebasefunction to call.
+  const joinOrLeave = ({ isJoined, item }) =>
+    isJoined ? leaveCommunity(item.id, user) : joinCommunity(item, user);
 
-  // determine the firebase callback function
-  const firebaseMutation = isJoined
-    ? () => leaveCommunity(communityData.id, user)
-    : () => joinCommunity(communityData, user);
-  // create react query object
-  const joinOrLeaveMuationQuery = useMutation(firebaseMutation, {
-    onSuccess: (data) => {
-      console.log("joinOrLeaveMutation success, response data:", data);
+  return useMutation(joinOrLeave, {
+    onSuccess: () => {
+      // no response data
+      console.log("joinOrLeaveMutation success");
       // invalidate querys
       queryClient.invalidateQueries(["communitySnippets"]);
       // get the response back from firebase,
       // instead of invalidating we can grab the community snippets and append the response to it and then manual set the query cache. that way we dont have to wait for an invalidation to update
     },
+    onError: (error) => {
+      console.log(error);
+    },
   });
-
-  return joinOrLeaveMuationQuery;
 };
 
 export const useCommunityData = (initialData) => {
@@ -233,6 +232,20 @@ export const useCommunityData = (initialData) => {
     enabled: Boolean(communityId),
     initialData: initialData,
   });
+};
+
+export const UseCreateNewPostMutation = () => {
+  const firebaseMutation = async (post) => {
+    const docRef = doc(collection(firestore, "posts"));
+    await setDoc(docRef, {
+      ...post,
+      id: docRef.id,
+    });
+    return docRef;
+  };
+
+  const queryObject = useMutation(firebaseMutation);
+  return queryObject;
 };
 
 // query keys

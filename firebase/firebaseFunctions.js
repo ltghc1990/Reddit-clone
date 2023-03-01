@@ -325,11 +325,50 @@ export const deleteComment = async ({ id, postId }) => {
 // fetch the top 10 most voted posts
 
 export const fetchPopularPosts = async () => {
+  console.log("no user fetch posts");
   const colRef = collection(firestore, "posts");
   const postQuery = query(colRef, orderBy("voteStatus", "desc"), limit(10));
   const postDocs = await getDocs(postQuery);
 
-  const data = postDocs.docs.map((doc) => ({ ...doc.data() }));
-  console.log(data);
-  return data;
+  return postDocs.docs.map((doc) => ({ ...doc.data() }));
+};
+
+export const fetchUserHomeFeed = async (userUid) => {
+  // get posts from users communities\
+  // grab users communities, if no communities exist then do a generic feed
+  const usersCommunitiesSnippets = await getDocs(
+    collection(firestore, "users", userUid, "communitySnippets")
+  );
+  if (usersCommunitiesSnippets) {
+    console.log("fetch users joined communites feed");
+    // const snippetsArray = usersCommunitiesSnippets.docs.map(
+    //   (doc) => ({ communityId } = doc.data())
+    // );
+    const snippetsArray = usersCommunitiesSnippets.docs.map((item) => {
+      return item.data().communityId;
+    });
+    const postQuery = query(
+      collection(firestore, "posts"),
+      where("communityId", "in", snippetsArray),
+      limit(10)
+    );
+
+    const postDocs = await getDocs(postQuery);
+    return postDocs.docs.map((doc) => ({ ...doc.data() }));
+  } else {
+    console.log("fetchGenericFeed because the user has no joined communites");
+    return fetchPopularPosts();
+  }
+};
+
+export const getCommunityReccomendations = async () => {
+  // grab top 5 communities with most members
+  const colRef = collection(firestore, "communities");
+  const fetchQuery = query(
+    colRef,
+    orderBy("numberOfMembers", "desc"),
+    limit(5)
+  );
+  const communityDocs = await getDocs(fetchQuery);
+  return communityDocs.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
