@@ -1,5 +1,7 @@
-# Template base includes:
+# Reddit clone project following tutorial done by Shadee Merhi on youtube
 
+
+npm installs :
 - Nextjs
 - Firebase
 - Chakra UI
