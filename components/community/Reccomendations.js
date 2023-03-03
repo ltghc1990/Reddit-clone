@@ -59,7 +59,7 @@ const Reccomendations = () => {
         </Flex>
         <Flex direction="column">
           {isLoading ? (
-            <SkelotonLoaders />
+            <SkeletonLoaders />
           ) : (
             <>
               {topCommunities.map((item, index) => {
@@ -70,6 +70,7 @@ const Reccomendations = () => {
                 return (
                   <Link key={item.id} href={`/r/${item.id}`}>
                     <Flex
+                      position="relative"
                       align="center"
                       borderColor="gray.200"
                       borderBottom="1px solid"
@@ -77,7 +78,7 @@ const Reccomendations = () => {
                     >
                       <Flex width="80%" align="center">
                         <Flex width="15%">
-                          <Text>{index * 1}</Text>
+                          <Text>{index + 1}</Text>
                         </Flex>
                         <Flex align="center" width="80%">
                           {item.imageURL ? (
@@ -93,19 +94,25 @@ const Reccomendations = () => {
                               <Icon as={() => RedditFace({ size: "20px" })} />
                             </Box>
                           )}
-                          <span className="overflow-hidden font-semibold text-gray-700 whitespace-nowrap text-ellipsis">
+                          <span className="overflow-hidden font-semibold text-gray-700 cursor-pointer whitespace-nowrap text-ellipsis">
                             {`r/${item.id}`}
                           </span>
                         </Flex>
                       </Flex>
-                      <Box>
+                      <Box position="absolute" right="10px">
                         <Button
                           size="sm"
                           borderRadius="full"
                           py="3"
                           px="6"
                           fontSize="14px"
-                          variant={isJoined ? "outline" : "solid"}
+                          bgColor={isJoined ? "gray.200" : "blue.500"}
+                          _hover={
+                            isJoined
+                              ? { bgColor: "gray.400", color: "white" }
+                              : { bgColor: "blue.400" }
+                          }
+                          color={isJoined ? "gray.500" : "white"}
                           onClick={(e) => {
                             e.stopPropagation();
                             mutate({ isJoined, item });
@@ -118,6 +125,11 @@ const Reccomendations = () => {
                   </Link>
                 );
               })}
+              <Box p="10px 20px">
+                <Button height="36px" width="100%" borderRadius="full">
+                  View All
+                </Button>
+              </Box>
             </>
           )}
         </Flex>
@@ -128,7 +140,7 @@ const Reccomendations = () => {
 
 export default Reccomendations;
 
-const SkelotonLoaders = () => {
+const SkeletonLoaders = () => {
   return (
     <Stack mt={2} p={3}>
       <Flex justify="space-between" align="center">

@@ -1,15 +1,15 @@
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
-  Text,
   Flex,
+  Icon,
+  Image,
   Menu,
   MenuButton,
   MenuList,
-  Icon,
-  Image,
-  Box,
+  Text,
 } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import RedditFace from "../RedditFace";
 
 import Communities from "./Communities";
@@ -18,23 +18,20 @@ import { useCommunityMenu } from "../../../../store/CommunityMenuProvider";
 import { useCommunityData } from "../../../../store/reactQueryHooks";
 
 const Directory = () => {
-  const { isOpen, setIsOpen, toggleCommunityMenu, closeMenu, buttonRef } =
+  const { isOpen, toggleCommunityMenu, buttonRef, closeMenu } =
     useCommunityMenu();
-
-  const { data: currentCommunity } = useCommunityData({
+  const homeFeed = {
     id: "Home",
     imageURL: HouseIcon,
-  });
-
-  const test = (e) => {
-    console.log("onClose triggered");
   };
 
-  // maybe have button ref, that
+  const { data: currentCommunity } = useCommunityData(homeFeed);
+
   return (
     <Box>
       <Menu isOpen={isOpen}>
         <MenuButton
+          ref={buttonRef}
           onClick={toggleCommunityMenu}
           as={Button}
           bgColor="white"
@@ -67,7 +64,7 @@ const Directory = () => {
           </Flex>
         </MenuButton>
         <MenuList>
-          <Communities />
+          <Communities homeFeed={homeFeed} />
         </MenuList>
       </Menu>
     </Box>

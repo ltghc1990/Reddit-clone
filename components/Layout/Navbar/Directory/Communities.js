@@ -1,4 +1,4 @@
-import { Box, Icon, MenuItem, Text, Link } from "@chakra-ui/react";
+import { Box, Icon, MenuItem, Text, Link, Flex } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 // import Link from "next/link";
@@ -11,19 +11,17 @@ import RedditFace from "../RedditFace";
 import MenuListItem from "./MenuListItem";
 
 import CreateCommunityModal from "../../../Modal/CreateCommunity/CreateCommunityModal";
-import {
-  useFetchCommunitySnippets,
-  getFirestoreCommunityData,
-} from "../../../../store/reactQueryHooks";
-import { fetchPosts } from "../../../../firebase/firebaseFunctions";
+import { useFetchCommunitySnippets } from "../../../../store/reactQueryHooks";
 import { useCommunityMenu } from "../../../../store/CommunityMenuProvider";
-
-const Communities = () => {
+import { useUserAuth } from "../../../../store/reactQueryHooks";
+const Communities = ({ homeFeed }) => {
   const { toggleCommunityMenu } = useCommunityMenu();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const { data } = useFetchCommunitySnippets();
+
+  const { data: user } = useUserAuth();
 
   // maybe dont have links but have onclicks which sets the querykey
   // things to invalidate
@@ -55,8 +53,33 @@ const Communities = () => {
       />
       <Box mt="3" mb="4">
         <Text pl="3" mb="1" fontSize="7" fontWeight="bold" textColor="gray.500">
-          MODERATING
+          Feed
         </Text>
+
+        <MenuItem
+          onClick={() => {
+            toggleCommunityMenu();
+            router.push("/");
+          }}
+        >
+          <Flex align="center">
+            <Icon as={homeFeed.imageURL} mr="2" />
+            <Text>{homeFeed.id}</Text>
+          </Flex>
+        </MenuItem>
+
+        {user && (
+          <Text
+            pl="3"
+            mb="1"
+            fontSize="7"
+            fontWeight="bold"
+            textColor="gray.500"
+          >
+            MODERATING
+          </Text>
+        )}
+
         {data &&
           data
             .filter((item) => item.isModerator)
@@ -68,33 +91,41 @@ const Communities = () => {
                   displayText={`r/${item.communityId}`}
                   imageURL={item.imageURL}
                   link={{ communityId: item.communityId }}
-                  onClick={() => onCommunityClick(item.communityId)}
+                  toggleCommunityMenu={toggleCommunityMenu}
                 />
               );
             })}
       </Box>
-      <Box mt="3" mb="4">
-        <Text pl="3" mb="1" fontSize="7" fontWeight="bold" textColor="gray.500">
-          MY COMMUNITIES{" "}
-        </Text>
-        <MenuItem onClick={() => setOpen(true)}>
-          <Icon as={AddIcon} mr="2" />
-          <Text fontSize={14}>Create Community</Text>
-        </MenuItem>
-        {data &&
-          data.map((item) => {
-            return (
-              <MenuListItem
-                key={item.communityId}
-                icon={() => RedditFace({ size: "18px", fill: "blue" })}
-                displayText={`r/${item.communityId}`}
-                imageURL={item.imageURL}
-                link={{ communityId: item.communityId }}
-                onClick={() => onCommunityClick(item.communityId)}
-              />
-            );
-          })}
-      </Box>
+      {user && (
+        <Box mt="3" mb="4">
+          <Text
+            pl="3"
+            mb="1"
+            fontSize="7"
+            fontWeight="bold"
+            textColor="gray.500"
+          >
+            MY COMMUNITIES
+          </Text>
+          <MenuItem onClick={() => setOpen(true)}>
+            <Icon as={AddIcon} mr="2" />
+            <Text fontSize={14}>Create Community</Text>
+          </MenuItem>
+          {data &&
+            data.map((item) => {
+              return (
+                <MenuListItem
+                  key={item.communityId}
+                  icon={() => RedditFace({ size: "18px", fill: "blue" })}
+                  displayText={`r/${item.communityId}`}
+                  imageURL={item.imageURL}
+                  link={{ communityId: item.communityId }}
+                  toggleCommunityMenu={toggleCommunityMenu}
+                />
+              );
+            })}
+        </Box>
+      )}
     </>
   );
 };

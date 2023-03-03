@@ -9,13 +9,12 @@ const MenuListItem = ({
   link,
   iconColor,
   imageURL,
-  onClick,
+  toggleCommunityMenu,
 }) => {
-  const test = () => {};
   return (
-    <MenuItem onClick={onClick}>
+    <MenuItem onClick={toggleCommunityMenu}>
       <Link href={{ pathname: `/r/[communityId]`, query: link }}>
-        <Flex align="center">
+        <Flex align="center" width="100%">
           {imageURL ? (
             <Image src={imageURL} boxSize="18px" alt="community image" mr="2" />
           ) : (

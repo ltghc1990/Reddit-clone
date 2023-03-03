@@ -1,7 +1,9 @@
 import React, { useState, createContext, useContext } from "react";
 
+// hook/context not needed anymore, and isnt being used anywhere in the app
+
 const SelectedPostContext = createContext();
-// can
+
 const SelectedPostProvider = ({ children }) => {
   const [selectedPost, setSelectedPost] = useState();
   return (

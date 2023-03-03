@@ -256,10 +256,3 @@ export const UseCreateNewPostMutation = () => {
 // ['posts, [...slug]'] the individual post
 // ['userPostVotes'] the users post votes, needed to show the users upvotes/downvotes
 // ['comments] = all the comments made for the individial post
-
-export const getFirestoreCommunityData = async (communityId) => {
-  const communityDocRef = doc(firestore, "communities", communityId);
-  const communityDoc = await getDoc(communityDocRef);
-
-  return { ...communityDoc.data(), id: communityDoc.id };
-};

@@ -45,7 +45,7 @@ const Navbar = () => {
           <RedditLogo />
         </Box>
       </HStack>
-      {user && <Directory />}
+      <Directory />
 
       <SearchInput />
 

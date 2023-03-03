@@ -8,7 +8,7 @@ import { useUserAuth } from "../../store/reactQueryHooks";
 import { useRouter } from "next/router";
 
 const CreatePostLink = () => {
-  const { isOpen, setIsOpen, toggleCommunityMenu } = useCommunityMenu();
+  const { toggleCommunityMenu } = useCommunityMenu();
   const { setModalSettings } = useContext(AuthModalContext);
 
   const { data: user } = useUserAuth();

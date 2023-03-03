@@ -7,6 +7,8 @@ import PageContent from "../components/Layout/PageContent";
 import PostLoader from "../components/Posts/PostLoader";
 import PostItem from "../components/Posts/PostItem";
 import Reccomendations from "../components/community/Reccomendations";
+import Premium from "../components/community/Premium";
+import PersonalHome from "../components/community/PersonalHome";
 
 // functions
 import { fetchUserPostVotes } from "../firebase/firebaseFunctions";
@@ -21,20 +23,14 @@ export default function Home(props) {
 
   let fetchFunction = null;
 
-  // 2 different data scenarios
-  // one where the user is logged in, one without
-
-  // this isUserLoggedIn function might not be nessary
-
-  // const IsUserLoggedIn = loadingUser === false && user;
-
+  //  current problem is that it always fetches popular post and doesnt wait
   const { data: homePagePosts, isLoading: loadingPosts } = useQuery(
     ["posts"],
     user ? () => fetchUserHomeFeed(user.uid) : fetchPopularPosts,
 
     fetchFunction,
     {
-      enabled: !loadingUser ? true : null,
+      enabled: !loadingUser,
       onSuccess: (response) => {},
     }
   );
@@ -73,19 +69,21 @@ export default function Home(props) {
           </Stack>
         )}
       </>
-      <>
+      <Stack spacing={6}>
         <Reccomendations />
-      </>
+        <Premium />
+        {user && <PersonalHome />}
+      </Stack>
     </PageContent>
   );
 }
 
-export async function getServerSideProps(context) {
-  const queryId = context.query?.communityId;
-  console.log(queryId);
-  return {
-    props: {
-      queryId: queryId ? queryId : null,
-    },
-  };
-}
+// export async function getServerSideProps(context) {
+//   const queryId = context.query?.communityId;
+//   console.log(queryId);
+//   return {
+//     props: {
+//       queryId: queryId ? queryId : null,
+//     },
+//   };
+// }
