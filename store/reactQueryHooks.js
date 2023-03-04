@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { auth, firestore } from "../firebase/clientApp";
 
@@ -102,20 +102,14 @@ export const useSignInWithUser = () => {
 // currently not workign as intended/ will not refresh without the onAuthChange function running
 export const useUserAuth = () => {
   const { modalSettings, setModalSettings } = useContext(AuthModalContext);
-  const { data, isLoading, error } = useQuery(
-    ["user"],
-    () => auth.currentUser,
-    {
-      onSuccess: (data) => {
-        // close modal because data exist?
-        if (data !== null && modalSettings.open === true) {
-          setModalSettings((prev) => ({ ...prev, open: false }));
-        }
-      },
-    }
-  );
-
-  return { data, isLoading, error };
+  return useQuery(["user"], () => auth.currentUser, {
+    onSuccess: (data) => {
+      // close modal because data exist?
+      if (data !== null && modalSettings.open === true) {
+        setModalSettings((prev) => ({ ...prev, open: false }));
+      }
+    },
+  });
 };
 
 //  fire base auth status

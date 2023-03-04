@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Text, Stack } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import CreatePostLink from "../components/community/CreatePostLink";
@@ -18,20 +19,37 @@ import {
   fetchUserHomeFeed,
 } from "../firebase/firebaseFunctions";
 
+// testing auth
+import { auth } from "../firebase/clientApp";
+import { onAuthStateChanged } from "firebase/auth";
+
 export default function Home(props) {
+  const [currentUser, setCurrentUser] = useState(undefined);
+  const [loadingCurrentUser, setLoadingUser] = useState(true);
+
+  useEffect(() => {
+    const unSub = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoadingUser(false);
+    });
+    return () => unSub();
+  }, [currentUser]);
   const { data: user, isLoading: loadingUser } = useUserAuth();
 
-  let fetchFunction = null;
+  // the  useUserAuth function in reatQueryHooks returns undefined --> null --> data when data is fetched, causing the fetchpopularPost function to always run even though we are logged in.
+  // using onAuthChange with useEffect allows it to work correctly
 
-  //  current problem is that it always fetches popular post and doesnt wait
+  // currentuser/user are the same user object
+
   const { data: homePagePosts, isLoading: loadingPosts } = useQuery(
     ["posts"],
     user ? () => fetchUserHomeFeed(user.uid) : fetchPopularPosts,
-
-    fetchFunction,
     {
-      enabled: !loadingUser,
-      onSuccess: (response) => {},
+      enabled: Boolean(!loadingCurrentUser),
+      onSuccess: (response) => {
+        console.log(response);
+      },
+      onError: (error) => console.log(error),
     }
   );
 
