@@ -8,8 +8,7 @@ const CommunityMenuProvider = ({ children }) => {
   const buttonRef = useRef();
 
   const toggleCommunityMenu = (e) => {
-    console.log(e);
-    e.stopPropagation();
+    e?.stopPropagation();
     setIsOpen(!isOpen);
   };
 

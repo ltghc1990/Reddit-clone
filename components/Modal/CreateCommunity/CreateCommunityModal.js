@@ -20,11 +20,9 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useMutationCommunity } from "../../../store/reactQueryHooks";
-import { useCommunityMenu } from "../../../store/CommunityMenuProvider";
 
-const CreateCommunityModal = ({ open, handleClose }) => {
+const CreateCommunityModal = ({ open, handleClose, toggleCommunityMenu }) => {
   const router = useRouter();
-  const { setIsOpen } = useCommunityMenu();
   const [communityName, setCommunityName] = useState("");
   const [charsRemaining, setCharsRemaining] = useState(21);
   const [communityType, setCommunityType] = useState("public");
@@ -36,15 +34,16 @@ const CreateCommunityModal = ({ open, handleClose }) => {
     // subtract the char limit of 21
     if (e.target.value.length > 21) return;
     setCommunityName(e.target.value);
-    setCharsRemaining(21 - event.target.value.length);
+    setCharsRemaining(21 - e.target.value.length);
   };
 
   const onCommunityTypeChange = (e) => {
     setCommunityType(e.target.name);
   };
 
-  const createCommunityHandler = async () => {
+  const createCommunityHandler = async (e) => {
     if (error) setError("");
+    // this format string does not remove the space at the end leading to incorrect routing.
     const format = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi;
     if (format.test(communityName) || communityName.length < 3) {
       setError(
@@ -54,7 +53,6 @@ const CreateCommunityModal = ({ open, handleClose }) => {
     }
 
     //  after validation create the community wuth firestore
-    // async await seems to be stoping the code from running
 
     mutate(
       { communityName, communityType },
@@ -65,11 +63,12 @@ const CreateCommunityModal = ({ open, handleClose }) => {
         },
         onSuccess: () => {
           router.push(`/r/${communityName}`);
-          setIsOpen(false);
+          toggleCommunityMenu(e);
         },
       }
     );
   };
+
   return (
     <>
       <Modal isOpen={open} onClose={handleClose} size="lg">

@@ -18,7 +18,7 @@ const Communities = ({ homeFeed }) => {
   const { toggleCommunityMenu } = useCommunityMenu();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const [openCommunityModal, setOpenCommunityModal] = useState(false);
   const { data } = useFetchCommunitySnippets();
 
   const { data: user } = useUserAuth();
@@ -45,11 +45,12 @@ const Communities = ({ homeFeed }) => {
   return (
     <>
       <CreateCommunityModal
-        open={open}
+        open={openCommunityModal}
         handleClose={() => {
           toggleCommunityMenu();
-          setOpen(false);
+          setOpenCommunityModal(false);
         }}
+        toggleCommunityMenu={toggleCommunityMenu}
       />
       <Box mt="3" mb="4">
         <Text pl="3" mb="1" fontSize="7" fontWeight="bold" textColor="gray.500">
@@ -57,8 +58,8 @@ const Communities = ({ homeFeed }) => {
         </Text>
 
         <MenuItem
-          onClick={() => {
-            toggleCommunityMenu();
+          onClick={(e) => {
+            toggleCommunityMenu(e);
             router.push("/");
           }}
         >
