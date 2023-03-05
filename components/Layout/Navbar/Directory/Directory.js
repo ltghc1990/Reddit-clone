@@ -63,7 +63,7 @@ const Directory = () => {
             </Text>
           </Flex>
         </MenuButton>
-        <MenuList>
+        <MenuList onClick={(e) => e.stopPropagation()}>
           <Communities homeFeed={homeFeed} />
         </MenuList>
       </Menu>

@@ -7,7 +7,9 @@ const CommunityMenuProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef();
 
-  const toggleCommunityMenu = () => {
+  const toggleCommunityMenu = (e) => {
+    console.log(e);
+    e.stopPropagation();
     setIsOpen(!isOpen);
   };
 
@@ -15,8 +17,9 @@ const CommunityMenuProvider = ({ children }) => {
     setIsOpen(false);
   };
 
-  const openMenu = () => {
+  const openMenu = (e) => {
     buttonRef?.current.scrollIntoView({ inline: "center" });
+    e.stopPropagation();
     setIsOpen(true);
   };
 
@@ -41,8 +44,4 @@ export const useCommunityMenu = () => {
 
 export default CommunityMenuProvider;
 
-// PROBLEM
-// This thing remains open if we click outside of it..
-
-// Fix
-//  Ive set a on click to the very top parent that sets setIsOpen(false). then in the menu commponent I have a onclick that stops propagation so when we click on the menu it stops the top parents onclick
+//  every component that can toggle the Menu needs a stop propation to prevent the global onclick close menu function. We can stop the propagation here by passing the event

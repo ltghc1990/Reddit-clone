@@ -25,7 +25,7 @@ const CreatePostLink = () => {
 
     if (!communityId) {
       e.target.blur();
-      toggleCommunityMenu();
+      toggleCommunityMenu(e);
       return;
     }
     router.push(`${communityId}/submit`);
