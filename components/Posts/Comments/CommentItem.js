@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import moment from "moment/moment";
 
 import RedditFace from "../../Layout/Navbar/RedditFace";
-import { ArrowDownCircleIcon, ArrowUpCircleIcon } from "../../Icons";
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, TrashIcon } from "../../Icons";
 
 import { deleteComment } from "../../../firebase/firebaseFunctions";
 const CommentItem = ({
@@ -45,15 +45,16 @@ const CommentItem = ({
 
   return (
     <Flex>
-      <Box border="1px">
+      <Box>
         <Icon as={RedditFace} />
       </Box>
-      <Box px="3">
-        <Flex align="center">
-          <Text fontWeight="bold" mr="2">
-            {creatorDisplayText}
-          </Text>
-          <Text textColor="gray.500" fontSize="10" fontWeight="600">
+      <Box px="3" py="2" width="full">
+        <Flex align="center" fontSize="12" mb="2" textColor="gray.700">
+          <Text fontWeight="bold">{creatorDisplayText}</Text>
+          <Box as="span" mx="1">
+            &middot;
+          </Box>
+          <Text fontWeight="500">
             {" "}
             {moment(new Date(createdAt?.seconds * 1000)).fromNow()}
           </Text>
@@ -63,21 +64,28 @@ const CommentItem = ({
           <Text>{text}</Text>
         </Box>
 
-        <Flex textColor="gray.500">
+        <Flex textColor="gray.500" my="2" align="center">
           <Box cursor="pointer">
             <Icon as={ArrowUpCircleIcon} />
           </Box>
+          <Text px="1">0</Text>
 
           <Box cursor="pointer">
             <Icon as={ArrowDownCircleIcon} />
           </Box>
           {isCreator && (
-            <Button
+            <Flex
+              p="2"
+              cursor="pointer"
+              ml="2"
+              borderRadius="lg"
               onClick={() => mutate({ id, postId })}
               isloading={isloading}
+              _hover={{ color: "gray.700", bg: "gray.100" }}
             >
-              Delete
-            </Button>
+              <Icon as={TrashIcon} />
+              <Text>Delete</Text>
+            </Flex>
           )}
         </Flex>
       </Box>

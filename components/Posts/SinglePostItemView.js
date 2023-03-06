@@ -166,23 +166,25 @@ const SinglePostItem = ({ post, user, userIsCreator, existingVoteValue }) => {
           <Icon as={ArrowDownCircleIcon} />
         </Box>
       </Flex>
-      <Flex direction="column" px="2">
+      <Flex direction="column" px="2" width="100%">
         {error && (
           <Alert status="error">
             <AlertIcon />
             <AlertDescription>Error Deleting Post</AlertDescription>
           </Alert>
         )}
-        <Stack spacing="1">
-          <HStack>
+        <Stack spacing="1" direction="column">
+          <HStack align="center" fontSize={12} py="10px">
             {/* icon if we are on the home page do not show icon */}
             <Text mt="2">
               Posted by u/{post.creatorDisplayName}{" "}
               {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
             </Text>
           </HStack>
-          <Text fontWeight="semibold">{post.title}</Text>
-          <Text>{post.body}</Text>
+          <Text fontWeight="semibold" textColor="gray.800">
+            {post.title}
+          </Text>
+          <Text fontSize="14">{post.body}</Text>
           {post.imageURL && (
             <Flex justify="center" align="center">
               {loadingImage && (
@@ -199,57 +201,31 @@ const SinglePostItem = ({ post, user, userIsCreator, existingVoteValue }) => {
             </Flex>
           )}
         </Stack>
-        <HStack my="2" fontSize="12">
-          <Flex
-            align="center"
-            py="2"
-            px="3"
-            borderRadius={4}
-            _hover={{ bg: "gray.200", cursor: "pointer" }}
-          >
+        <HStack spacing={1} my="2">
+          <IconWrapper>
             <Icon as={ChatBubbleIcon} />
-            <Text ml="1">{post.numberOfComments}</Text>
-          </Flex>
-
-          <Flex
-            align="center"
-            py="2"
-            px="3"
-            borderRadius={4}
-            _hover={{ bg: "gray.200", cursor: "pointer" }}
-          >
+            <Text pl="1">{post.numberOfComments} comments</Text>
+          </IconWrapper>
+          <IconWrapper>
             <Icon as={ShareIcon} />
-            <Text>Share</Text>
-          </Flex>
-
-          <Flex
-            align="center"
-            py="2"
-            px="3"
-            borderRadius={4}
-            _hover={{ bg: "gray.200", cursor: "pointer" }}
-          >
+            <Text pl="1">Share</Text>
+          </IconWrapper>
+          <IconWrapper>
             <Icon as={BookmarkIcon} />
-            <Text>Save</Text>
-          </Flex>
+            <Text pl="1">Save</Text>
+          </IconWrapper>
+
           {userIsCreator && (
-            <Flex
-              align="center"
-              py="2"
-              px="3"
-              borderRadius={4}
-              _hover={{ bg: "gray.200", cursor: "pointer" }}
-              onClick={handleDelete}
-            >
+            <IconWrapper onClick={handleDelete}>
               {isLoading ? (
                 <Spinner size="sm" />
               ) : (
                 <>
                   <Icon as={DeleteIcon} />
-                  <Text>Delete</Text>
+                  <Text p1="1">Delete</Text>
                 </>
               )}
-            </Flex>
+            </IconWrapper>
           )}
         </HStack>
       </Flex>
@@ -257,3 +233,21 @@ const SinglePostItem = ({ post, user, userIsCreator, existingVoteValue }) => {
   );
 };
 export default SinglePostItem;
+
+const IconWrapper = ({ children, onClick }) => {
+  return (
+    <Flex
+      fontSize="12"
+      textColor="gray.500"
+      cursor="pointer"
+      fontWeight="bold"
+      onClick={onClick}
+      align="center"
+      p="2"
+      borderRadius="lg"
+      _hover={{ bg: "gray.200", textColor: "gray.600" }}
+    >
+      {children}
+    </Flex>
+  );
+};

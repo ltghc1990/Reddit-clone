@@ -108,7 +108,7 @@ const Communities = ({ homeFeed }) => {
           >
             MY COMMUNITIES
           </Text>
-          <MenuItem onClick={() => setOpen(true)}>
+          <MenuItem onClick={() => setOpenCommunityModal(true)}>
             <Icon as={AddIcon} mr="2" />
             <Text fontSize={14}>Create Community</Text>
           </MenuItem>

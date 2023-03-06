@@ -53,12 +53,11 @@ const PostItem = ({
 
   const onSelectPost = () => {
     queryClient.setQueryData(["posts", post.id], { ...post });
-    //  since we route to a new page the refresh removes all our cache stored in the keys.
-    //  selected post put into a context, take the users postVotes and also put it into state
     router.push(`/r/${post.communityId}/comments/${post.id}`);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.stopPropagation();
     mutate(post, {
       onSuccess: () => {
         console.log("post successfully deleted");
@@ -199,27 +198,27 @@ const PostItem = ({
           <Icon as={ArrowDownCircleIcon} />
         </Box>
       </Flex>
-      <Flex direction="column" px="2">
+      <Flex direction="column" px="2" width="100%">
         {error && (
           <Alert status="error">
             <AlertIcon />
             <AlertDescription>Error Deleting Post</AlertDescription>
           </Alert>
         )}
-        <Stack spacing="1">
-          <HStack align="center" fontSize={14} py="10px">
+        <Stack spacing={1} direction="column">
+          <HStack align="center" fontSize={12} py="10px">
             {/* if on home page show community icon so they can click and go it= */}
             {homePage && (
               <>
                 {post.communityImageURL ? (
                   <Image
-                    boxSize={9}
+                    boxSize={7}
                     borderRadius="full"
                     src={post.communityImageURL}
                     alt={post.communityId}
                   />
                 ) : (
-                  <Icon as={() => RedditFace({ fill: "blue" })} />
+                  <Icon as={() => RedditFace({ fill: "blue", size: "28px" })} />
                 )}
                 <Link href={`/r/${post.communityId}`}>
                   <Text
@@ -241,8 +240,10 @@ const PostItem = ({
               {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
             </Text>
           </HStack>
-          <Text fontWeight="semibold">{post.title}</Text>
-          <Text>{post.body}</Text>
+          <Text fontWeight="semibold" textColor="gray.800">
+            {post.title}
+          </Text>
+          <Text fontSize="14">{post.body}</Text>
           {post.imageURL && (
             <Flex justify="center" align="center">
               {loadingImage && (
@@ -259,57 +260,31 @@ const PostItem = ({
             </Flex>
           )}
         </Stack>
-        <HStack my="2" fontSize="12">
-          <Flex
-            align="center"
-            py="2"
-            px="3"
-            borderRadius={4}
-            _hover={{ bg: "gray.200" }}
-          >
+        <HStack spacing={1} my="2" fontSize="12" textColor="gray.600">
+          <IconWrapper>
             <Icon as={ChatBubbleIcon} />
-            <Text>{post.numberOfComments}</Text>
-          </Flex>
-
-          <Flex
-            align="center"
-            py="2"
-            px="3"
-            borderRadius={4}
-            _hover={{ bg: "gray.200" }}
-          >
+            <Text pl="1">{post.numberOfComments} comments</Text>
+          </IconWrapper>
+          <IconWrapper>
             <Icon as={ShareIcon} />
-            <Text>Share</Text>
-          </Flex>
-
-          <Flex
-            align="center"
-            py="2"
-            px="3"
-            borderRadius={4}
-            _hover={{ bg: "gray.200" }}
-          >
+            <Text pl="1">Share</Text>
+          </IconWrapper>
+          <IconWrapper>
             <Icon as={BookmarkIcon} />
-            <Text>Save</Text>
-          </Flex>
+            <Text pl="1">Save</Text>
+          </IconWrapper>
+
           {userIsCreator && (
-            <Flex
-              align="center"
-              py="2"
-              px="3"
-              borderRadius={4}
-              _hover={{ bg: "gray.200" }}
-              onClick={handleDelete}
-            >
+            <IconWrapper onClick={handleDelete}>
               {isLoading ? (
                 <Spinner size="sm" />
               ) : (
                 <>
                   <Icon as={DeleteIcon} />
-                  <Text>Delete</Text>
+                  <Text p1="1">Delete</Text>
                 </>
               )}
-            </Flex>
+            </IconWrapper>
           )}
         </HStack>
       </Flex>
@@ -317,3 +292,21 @@ const PostItem = ({
   );
 };
 export default PostItem;
+
+const IconWrapper = ({ children, onClick }) => {
+  return (
+    <Flex
+      fontSize="12"
+      textColor="gray.500"
+      cursor="pointer"
+      fontWeight="bold"
+      onClick={onClick}
+      align="center"
+      p="2"
+      borderRadius="lg"
+      _hover={{ bg: "gray.200", textColor: "gray.600" }}
+    >
+      {children}
+    </Flex>
+  );
+};
