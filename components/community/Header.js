@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Box, Flex, Icon, Text, Button, Image } from "@chakra-ui/react";
 
 // import RedditFace from "../Layout/Navbar/RedditFace";
-import { AuthModalContext } from "../../store/ AuthModalProvider";
+import { AuthModalContext } from "../../store/AuthModalProvider";
 import {
   useUserAuth,
   useFetchCommunitySnippets,
