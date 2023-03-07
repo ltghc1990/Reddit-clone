@@ -6,7 +6,7 @@ import RedditFace from "../../Layout/Navbar/RedditFace";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../../firebase/clientApp";
 
-import { AuthModalContext } from "../../../store/AuthmodalProvider";
+import { AuthModalContext } from "../../../store/ AuthModalProvider";
 
 const ResetPassword = () => {
   const { setModalSettings } = useContext(AuthModalContext);

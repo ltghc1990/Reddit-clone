@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Button } from "@chakra-ui/react";
 
-import { AuthModalContext } from "../../../../store/AuthmodalProvider";
+import { AuthModalContext } from "../../../../store/AuthModalProvider";
 
 const AuthButtons = () => {
   const { setModalSettings } = useContext(AuthModalContext);

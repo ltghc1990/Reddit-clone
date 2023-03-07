@@ -30,7 +30,7 @@ import { onDeletePost, onPostVote } from "../../firebase/firebaseFunctions";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AuthModalContext } from "../../store/AuthmodalProvider";
+import { AuthModalContext } from "../../store/ AuthModalProvider";
 
 const SinglePostItem = ({ post, user, userIsCreator, existingVoteValue }) => {
   const router = useRouter();

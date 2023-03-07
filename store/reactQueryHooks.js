@@ -10,7 +10,7 @@ import {
 } from "../firebase/firebaseFunctions";
 
 // used to close modal
-import { AuthModalContext } from "./AuthmodalProvider";
+import { AuthModalContext } from "./AuthModalProvider";
 
 // mix of react query and firebase functions
 import {

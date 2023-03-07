@@ -10,7 +10,7 @@ import {
 
 // logic
 import { useContext } from "react";
-import { AuthModalContext } from "../../../store/AuthmodalProvider";
+import { AuthModalContext } from "../../../store/ AuthModalProvider";
 
 // components
 import AuthInputs from "./AuthInputs";

@@ -61,7 +61,7 @@ const CommentItem = ({
         </Flex>
 
         <Box>
-          <Text>{text}</Text>
+          <Text fontSize="14">{text}</Text>
         </Box>
 
         <Flex textColor="gray.500" my="2" align="center">
@@ -75,9 +75,11 @@ const CommentItem = ({
           </Box>
           {isCreator && (
             <Flex
+              align="center"
               p="2"
-              cursor="pointer"
               ml="2"
+              cursor="pointer"
+              fontSize="12"
               borderRadius="lg"
               onClick={() => mutate({ id, postId })}
               isloading={isloading}

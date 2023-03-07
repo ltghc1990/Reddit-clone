@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { Layout } from "../components/Layout/Layout";
-import AuthModalProvider from "../store/AuthmodalProvider";
+import AuthModalProvider from "../store/AuthModalProvider";
 import CommunityMenuProvider from "../store/CommunityMenuProvider";
 
 import { useRouter } from "next/router";

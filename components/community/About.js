@@ -22,7 +22,7 @@ import { uploadCommunityIcon } from "../../firebase/firebaseFunctions";
 import { useUserAuth } from "../../store/reactQueryHooks";
 import { useSelectFile } from "../../store/useSelectFile";
 
-import { AuthModalContext } from "../../store/AuthmodalProvider";
+import { AuthModalContext } from "../../store/ AuthModalProvider";
 import { useCommunityData } from "../../store/reactQueryHooks";
 
 // About component may render with props.

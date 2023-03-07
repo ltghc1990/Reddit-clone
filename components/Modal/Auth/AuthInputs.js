@@ -1,9 +1,9 @@
 import { Flex } from "@chakra-ui/react";
 import React, { useContext } from "react";
-import { AuthModalContext } from "../../../store/AuthmodalProvider";
+import { AuthModalContext } from "../../../store/ AuthModalProvider";
 
 import Login from "./Login";
-import Signup from "./Signup"
+import Signup from "./Signup";
 
 const AuthInputs = () => {
   const { modalSettings } = useContext(AuthModalContext);
