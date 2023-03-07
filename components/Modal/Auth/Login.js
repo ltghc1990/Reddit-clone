@@ -3,7 +3,7 @@ import React, { useState, useContext } from "react";
 
 import { FIREBASE_ERRORS } from "../../../firebase/errors";
 
-import { AuthModalContext } from "../../../store/ AuthModalProvider";
+import { AuthModalContext } from "../../../store/AuthModalProvider";
 
 import { useSignInWithUser } from "../../../store/reactQueryHooks";
 

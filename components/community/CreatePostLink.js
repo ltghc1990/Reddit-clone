@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import RedditFace from "../Layout/Navbar/RedditFace";
 
-import { AuthModalContext } from "../../store/ AuthModalProvider";
+import { AuthModalContext } from "../../store/AuthModalProvider";
 import { useCommunityMenu } from "../../store/CommunityMenuProvider";
 import { Flex, Icon, Input, HStack, Box } from "@chakra-ui/react";
 import { useUserAuth } from "../../store/reactQueryHooks";

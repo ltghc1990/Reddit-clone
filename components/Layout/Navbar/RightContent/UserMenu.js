@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { AuthModalContext } from "../../../../store/ AuthModalProvider";
+import { AuthModalContext } from "../../../../store/AuthModalProvider";
 import {
   Button,
   Text,

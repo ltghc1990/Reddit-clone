@@ -32,7 +32,7 @@ import { onDeletePost, onPostVote } from "../../firebase/firebaseFunctions";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AuthModalContext } from "../../store/ AuthModalProvider";
+import { AuthModalContext } from "../../store/AuthModalProvider";
 
 const PostItem = ({
   post,

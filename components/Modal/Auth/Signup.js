@@ -1,7 +1,7 @@
 import { Flex, Input, Text, Button } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
 
-import { AuthModalContext } from "../../../store/ AuthModalProvider";
+import { AuthModalContext } from "../../../store/AuthModalProvider";
 import { FIREBASE_ERRORS } from "../../../firebase/errors";
 
 // function
