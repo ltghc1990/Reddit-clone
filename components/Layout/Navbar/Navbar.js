@@ -40,13 +40,15 @@ const Navbar = () => {
         onClick={() => router.push("/")}
       >
         <RedditFace />
-        <Box display={{ base: "none", sm: "unset" }}>
+        <Box display={{ base: "none", md: "unset" }}>
           <RedditLogo />
         </Box>
       </HStack>
       <Directory />
 
-      <SearchInput />
+      <Flex width="100%" justify="center" mx={{ lg: 2, xl: 12 }}>
+        <SearchInput />
+      </Flex>
 
       <RightContent />
     </Flex>

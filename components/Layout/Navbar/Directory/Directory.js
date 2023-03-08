@@ -18,8 +18,7 @@ import { useCommunityMenu } from "../../../../store/CommunityMenuProvider";
 import { useCommunityData } from "../../../../store/reactQueryHooks";
 
 const Directory = () => {
-  const { isOpen, toggleCommunityMenu, buttonRef, closeMenu } =
-    useCommunityMenu();
+  const { isOpen, toggleCommunityMenu, buttonRef } = useCommunityMenu();
   const homeFeed = {
     id: "Home",
     imageURL: HouseIcon,
@@ -28,7 +27,7 @@ const Directory = () => {
   const { data: currentCommunity } = useCommunityData(homeFeed);
 
   return (
-    <Box mr="auto">
+    <Box mr={{ base: "auto" }}>
       <Menu isOpen={isOpen}>
         <MenuButton
           ref={buttonRef}
@@ -42,7 +41,7 @@ const Directory = () => {
         >
           <Flex align="center">
             {currentCommunity?.imageURL ? (
-              <Box boxSize={6} mr={{ base: 0, md: 2 }}>
+              <Box boxSize={6} mr="2">
                 {currentCommunity.id == "Home" ? (
                   <Icon as={HouseIcon} />
                 ) : (
@@ -58,9 +57,7 @@ const Directory = () => {
               </Box>
             )}
 
-            <Text display={{ base: "none", sm: "block" }}>
-              {currentCommunity && currentCommunity.id}
-            </Text>
+            <Text>{currentCommunity?.id}</Text>
           </Flex>
         </MenuButton>
         <MenuList onClick={(e) => e.stopPropagation()}>

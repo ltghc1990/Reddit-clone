@@ -1,4 +1,12 @@
-import { Button, Flex, Image, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Image,
+  Text,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+} from "@chakra-ui/react";
 
 import { useGoogleAuth } from "../../../store/reactQueryHooks";
 
@@ -11,7 +19,13 @@ const OAuthButtons = () => {
   };
 
   return (
-    <Flex justify={"center"} mb="6">
+    <Flex direction="column" justify="center" align="center" mb="6">
+      {error && (
+        <Alert status="error" mb="6">
+          <AlertIcon />
+          <AlertDescription>{error.message}</AlertDescription>
+        </Alert>
+      )}
       <Button onClick={onClick}>
         <Image
           src="\images\googleIcon.svg"
@@ -21,7 +35,6 @@ const OAuthButtons = () => {
         />
         Continue with Google
       </Button>
-      {error && <Text>{error.message}</Text>}
     </Flex>
   );
 };
