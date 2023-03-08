@@ -26,22 +26,21 @@ const Navbar = () => {
 
   return (
     <Flex
-      className="justify-between outline"
+      justify="space-between"
+      align="center"
       bg={"white"}
       height="12"
       px="4"
       py="6"
-      align={"center"}
     >
       <HStack
         align={"center"}
-        space="4"
         mr={4}
         cursor="pointer"
         onClick={() => router.push("/")}
       >
         <RedditFace />
-        <Box display={{ base: "none", md: "unset" }}>
+        <Box display={{ base: "none", sm: "unset" }}>
           <RedditLogo />
         </Box>
       </HStack>

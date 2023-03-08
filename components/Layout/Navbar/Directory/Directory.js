@@ -28,7 +28,7 @@ const Directory = () => {
   const { data: currentCommunity } = useCommunityData(homeFeed);
 
   return (
-    <Box>
+    <Box mr="auto">
       <Menu isOpen={isOpen}>
         <MenuButton
           ref={buttonRef}
@@ -58,7 +58,7 @@ const Directory = () => {
               </Box>
             )}
 
-            <Text display={{ base: "none", md: "block" }}>
+            <Text display={{ base: "none", sm: "block" }}>
               {currentCommunity && currentCommunity.id}
             </Text>
           </Flex>

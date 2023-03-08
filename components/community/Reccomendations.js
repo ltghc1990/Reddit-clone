@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { AuthModalContext } from "../../store/AuthModalProvider";
 import {
   Box,
   Button,
@@ -20,7 +22,9 @@ import {
 
 import RedditFace from "../Layout/Navbar/RedditFace";
 
-const Reccomendations = () => {
+const Reccomendations = ({ user }) => {
+  const { setModalSettings } = useContext(AuthModalContext);
+
   const { mutate, isLoading: loadingMutation } = useOnJoinorLeaveCommunity();
   const {
     data: topCommunities,
@@ -115,6 +119,15 @@ const Reccomendations = () => {
                           color={isJoined ? "gray.500" : "white"}
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (!user) {
+                              setModalSettings((prev) => ({
+                                ...prev,
+                                open: true,
+                                view: "login",
+                              }));
+                              return;
+                            }
+
                             mutate({ isJoined, item });
                           }}
                         >

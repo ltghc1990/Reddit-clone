@@ -177,6 +177,7 @@ const PostItem = ({
       onClick={onSelectPost}
     >
       <Flex
+        display={{ base: "none", md: "flex" }}
         direction="column"
         align="center"
         width="10"
@@ -190,7 +191,9 @@ const PostItem = ({
         >
           <Icon as={ArrowUpCircleIcon} />
         </Box>
-        <Text fontSize="9">{post.voteStatus}</Text>
+        <Text fontWeight="bold" fontSize="12">
+          {post.voteStatus}
+        </Text>
         <Box
           color={existingVoteValue === -1 ? "#4379ff" : "gray.400"}
           onClick={(event) => handleVote(-1, event)}
@@ -260,32 +263,40 @@ const PostItem = ({
             </Flex>
           )}
         </Stack>
+
         <HStack spacing={1} my="2" fontSize="12" textColor="gray.600">
+          <MobileVotingView
+            existingVoteValue={existingVoteValue}
+            voteStatus={post.voteStatus}
+            handleVote={handleVote}
+          />
           <IconWrapper>
             <Icon as={ChatBubbleIcon} />
             <Text pl="1">{post.numberOfComments} comments</Text>
           </IconWrapper>
-          <IconWrapper>
-            <Icon as={ShareIcon} />
-            <Text pl="1">Share</Text>
-          </IconWrapper>
-          <IconWrapper>
-            <Icon as={BookmarkIcon} />
-            <Text pl="1">Save</Text>
-          </IconWrapper>
-
-          {userIsCreator && (
-            <IconWrapper onClick={handleDelete}>
-              {isLoading ? (
-                <Spinner size="sm" />
-              ) : (
-                <>
-                  <Icon as={DeleteIcon} />
-                  <Text p1="1">Delete</Text>
-                </>
-              )}
+          <Flex display={{ base: "none", sm: "flex" }}>
+            <IconWrapper>
+              <Icon as={ShareIcon} />
+              <Text pl="1">Share</Text>
             </IconWrapper>
-          )}
+            <IconWrapper>
+              <Icon as={BookmarkIcon} />
+              <Text pl="1">Save</Text>
+            </IconWrapper>
+
+            {userIsCreator && (
+              <IconWrapper onClick={handleDelete}>
+                {isLoading ? (
+                  <Spinner size="sm" />
+                ) : (
+                  <>
+                    <Icon as={DeleteIcon} />
+                    <Text p1="1">Delete</Text>
+                  </>
+                )}
+              </IconWrapper>
+            )}
+          </Flex>
         </HStack>
       </Flex>
     </Flex>
@@ -307,6 +318,28 @@ const IconWrapper = ({ children, onClick }) => {
       _hover={{ bg: "gray.200", textColor: "gray.600" }}
     >
       {children}
+    </Flex>
+  );
+};
+
+const MobileVotingView = ({ existingVoteValue, voteStatus, handleVote }) => {
+  return (
+    <Flex align="center" display={{ base: "flex", md: "none" }}>
+      <Box
+        color={existingVoteValue === 1 ? "red.500" : "gray.400"}
+        onClick={(event) => handleVote(1, event)}
+      >
+        <Icon as={ArrowUpCircleIcon} />
+      </Box>
+      <Text fontWeight="bold" fontSize="12">
+        {voteStatus}
+      </Text>
+      <Box
+        color={existingVoteValue === -1 ? "#4379ff" : "gray.400"}
+        onClick={(event) => handleVote(-1, event)}
+      >
+        <Icon as={ArrowDownCircleIcon} />
+      </Box>
     </Flex>
   );
 };

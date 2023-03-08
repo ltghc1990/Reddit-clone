@@ -88,7 +88,7 @@ export default function Home(props) {
         )}
       </>
       <Stack spacing={6}>
-        <Reccomendations />
+        <Reccomendations user={user?.uid} />
         <Premium />
         {user && <PersonalHome />}
       </Stack>

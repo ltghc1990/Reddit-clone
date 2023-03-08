@@ -8,7 +8,11 @@ import { useUserAuth } from "../../../store/reactQueryHooks";
 const SearchInput = () => {
   const { data: user } = useUserAuth();
   return (
-    <InputGroup maxW={user ? "auto" : "600px"} mx="2">
+    <InputGroup
+      maxW={user ? "auto" : "600px"}
+      mx="2"
+      display={{ base: "none", md: "unset" }}
+    >
       <InputLeftElement pointerEvents="none">
         <SearchIcon color="gray.400" />
       </InputLeftElement>
