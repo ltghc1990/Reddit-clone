@@ -30,6 +30,8 @@ const Directory = () => {
     <Box mr={{ base: "auto" }}>
       <Menu isOpen={isOpen}>
         <MenuButton
+          size={{ base: "xs", sm: "sm", md: "md" }}
+          maxWidth={{ base: "105px", sm: "unset" }}
           ref={buttonRef}
           onClick={toggleCommunityMenu}
           as={Button}
@@ -52,7 +54,7 @@ const Directory = () => {
                 )}
               </Box>
             ) : (
-              <Box mr={{ base: 0, md: "2" }}>
+              <Box mr="2">
                 <Icon as={() => RedditFace({ size: "24px" })} />
               </Box>
             )}
