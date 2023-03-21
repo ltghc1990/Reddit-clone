@@ -22,6 +22,7 @@ const SubmitPostPage = () => {
             Create a Post
           </Text>
         </Box>
+
         <NewPostForm communityImageURL={data?.imageURL} />
       </>
       <>

@@ -5,8 +5,10 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
+  Box,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 import {
   DocumentIcon,
@@ -17,18 +19,10 @@ import {
 } from "../Icons";
 
 import { useRouter } from "next/router";
-import { firestore, storage } from "../../firebase/clientApp";
-import {
-  serverTimestamp,
-  collection,
-  addDoc,
-  updateDoc,
-  doc,
-  setDoc,
-} from "firebase/firestore";
+import { storage } from "../../firebase/clientApp";
+import { serverTimestamp, updateDoc } from "firebase/firestore";
 
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
-import { useMutation } from "@tanstack/react-query";
 import {
   useUserAuth,
   UseCreateNewPostMutation,
@@ -37,6 +31,7 @@ import { useSelectFile } from "../../store/useSelectFile";
 
 import ImageUpload from "./PostForm/ImageUpload";
 import TextInputs from "./PostForm/TextInputs";
+import { AnimatePresence } from "framer-motion";
 
 const formTabs = [
   { title: "Post", icon: DocumentIcon },
@@ -58,12 +53,7 @@ const NewPostForm = ({ communityImageURL }) => {
 
   const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
 
-  const {
-    data: postResponse,
-    isLoading,
-    error,
-    mutate,
-  } = UseCreateNewPostMutation();
+  const { isLoading, error, mutate } = UseCreateNewPostMutation();
 
   const onTextChange = (e) => {
     setTextInputs({ ...textInputs, [e.target.name]: e.target.value });
@@ -120,6 +110,7 @@ const NewPostForm = ({ communityImageURL }) => {
           return (
             <Flex
               key={item.title}
+              position="relative"
               p="2"
               py={{ lg: 3 }}
               cursor="pointer"
@@ -129,13 +120,24 @@ const NewPostForm = ({ communityImageURL }) => {
               role="group"
               fontWeight="700"
               borderColor="gray.200"
-              borderWidth="0px 1px 2px 0px"
-              borderBottomColor={index === currentIndex && "blue.500"}
+              borderWidth="0px 1px 1px 0px"
             >
+              {index === currentIndex && (
+                <Box
+                  as={motion.div}
+                  layoutId="underline"
+                  position="absolute"
+                  height="2px"
+                  left="0"
+                  right="0"
+                  bottom="0"
+                  bgColor="blue.500"
+                />
+              )}
+
               <Flex
                 mx="auto"
                 color={index === currentIndex ? "blue.500" : "gray.500"}
-                // _groupHover={{ color: "gray.800" }}
                 _groupHover={index !== currentIndex && { color: "gray.800" }}
               >
                 <Icon as={item.icon} />
@@ -145,23 +147,34 @@ const NewPostForm = ({ communityImageURL }) => {
           );
         })}
       </Flex>
-      {selectedTab.title === "Post" && (
-        <TextInputs
-          textInputs={textInputs}
-          onTextChange={onTextChange}
-          handleCreatePost={handleCreatePost}
-          isLoading={isLoading}
-        />
-      )}
+      <AnimatePresence exitBeforeEnter initial={false}>
+        <Box
+          key={selectedTab.title}
+          as={motion.div}
+          initial={{ opacity: 0, y: "-10px" }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 1, y: "10px", transition: { duration: 0.1 } }}
+        >
+          {selectedTab.title === "Post" && (
+            <TextInputs
+              textInputs={textInputs}
+              onTextChange={onTextChange}
+              handleCreatePost={handleCreatePost}
+              isLoading={isLoading}
+            />
+          )}
 
-      {selectedTab.title === "Photo" && (
-        <ImageUpload
-          selectedFile={selectedFile}
-          removeImage={() => setSelectedFile("")}
-          onSelectImage={onSelectFile}
-          setSelectedTab={() => setSelectedTab(formTabs[0])}
-        />
-      )}
+          {selectedTab.title === "Photo" && (
+            <ImageUpload
+              selectedFile={selectedFile}
+              removeImage={() => setSelectedFile("")}
+              onSelectImage={onSelectFile}
+              setSelectedTab={() => setSelectedTab(formTabs[0])}
+            />
+          )}
+        </Box>
+      </AnimatePresence>
+
       {error && (
         <Alert status="error">
           <AlertIcon />
