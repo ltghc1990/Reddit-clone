@@ -46,7 +46,7 @@ const CommentInput = ({ user, communityId, selectedPost }) => {
           const commentsCache = queryClient.getQueryData(["comments"]);
           queryClient.setQueryData(
             ["comments"],
-            [...commentsCache, { ...response }]
+            [{ ...response }, ...commentsCache]
           );
         },
       }
@@ -58,7 +58,6 @@ const CommentInput = ({ user, communityId, selectedPost }) => {
       {user ? (
         <>
           {/* user should  be a link that takes you to your profile */}
-          {/* https://www.reddit.com/user/Kind-Presentation-52/ */}
 
           <Text fontSize={{ base: 14, lg: 16 }} mb="4">
             Comment as{" "}
@@ -68,7 +67,7 @@ const CommentInput = ({ user, communityId, selectedPost }) => {
           </Text>
           <Textarea
             fontSize={14}
-            placeholder="What are your thoughs?"
+            placeholder="What are your thoughts?"
             height="120px"
             value={comment}
             onChange={(e) => setComment(e.target.value)}

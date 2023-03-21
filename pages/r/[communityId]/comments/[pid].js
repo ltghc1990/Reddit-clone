@@ -86,12 +86,12 @@ const PostPage = () => {
 
 export default PostPage;
 
-export async function getServerSideProps(context) {
-  const queryId = context.query;
+// export async function getServerSideProps(context) {
+//   const queryId = context.query;
 
-  return {
-    props: {
-      // queryId,
-    },
-  };
-}
+//   return {
+//     props: {
+//       // queryId,
+//     },
+//   };
+// }

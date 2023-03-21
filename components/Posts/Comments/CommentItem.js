@@ -1,6 +1,8 @@
-import { Box, Flex, Icon, Text, Button } from "@chakra-ui/react";
+import { Box, Flex, Icon, Text } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import moment from "moment/moment";
+
+import { motion } from "framer-motion";
 
 import RedditFace from "../../Layout/Navbar/RedditFace";
 import { ArrowDownCircleIcon, ArrowUpCircleIcon, TrashIcon } from "../../Icons";
@@ -44,7 +46,14 @@ const CommentItem = ({
   });
 
   return (
-    <Flex>
+    <Flex
+      as={motion.div}
+      layout
+      transition={{ duration: 0.5, type: "ease-in-out" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <Box>
         <Icon as={RedditFace} />
       </Box>

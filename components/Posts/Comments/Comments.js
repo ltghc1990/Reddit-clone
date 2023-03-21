@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Flex,
@@ -7,6 +6,8 @@ import {
   SkeletonText,
   Text,
 } from "@chakra-ui/react";
+
+import { AnimatePresence } from "framer-motion";
 
 import CommentItem from "./CommentItem";
 
@@ -56,12 +57,12 @@ const Comments = ({ children, postId, user }) => {
                 No Comments Yet
               </Text>
             ) : (
-              <>
+              <AnimatePresence>
                 {data &&
                   data.map((item) => {
                     return <CommentItem key={item.id} {...item} user={user} />;
                   })}
-              </>
+              </AnimatePresence>
             )}
           </>
         )}
