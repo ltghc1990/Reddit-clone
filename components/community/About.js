@@ -4,14 +4,15 @@ import {
   Divider,
   Flex,
   Icon,
-  Image,
   Input,
   Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import moment from "moment";
-import Link from "next/link";
+
+import Image from "next/image";
+
 import { useRouter } from "next/router";
 import { useContext, useRef } from "react";
 import { CakeIcon, TripleDotsHorizontal } from "../Icons";
@@ -104,11 +105,11 @@ const About = (props) => {
             )}
           </Text>
         </Flex>
-        {/* <Link href={`/r/${communityData?.id}/submit`}> */}
+
         <Button onClick={handleCreatePost} mt="3">
           Create Post
         </Button>
-        {/* </Link> */}
+
         {user?.uid === communityData?.creatorId && (
           <>
             <Divider />
@@ -123,24 +124,26 @@ const About = (props) => {
                 >
                   Change Image
                 </Text>
-                {communityData?.imageURL || selectedFile ? (
-                  <Box
-                    maxW="12"
-                    maxH="12"
-                    overflow="hidden"
-                    border="2px"
-                    borderRadius="full"
-                    borderColor="gray.200"
-                  >
+                <Box
+                  border="2px"
+                  boxSize="42px"
+                  overflow="hidden"
+                  borderRadius="full"
+                  borderColor="gray.200"
+                  position="relative"
+                >
+                  {communityData?.imageURL || selectedFile ? (
                     <Image
-                      src={selectedFile || communityData?.imageURL}
+                      src={selectedFile || communityData.imageURL}
                       alt="community image"
                       objectFit="cover"
+                      layout="fill"
+                      position="absolute"
                     />
-                  </Box>
-                ) : (
-                  <Icon as={RedditFace} />
-                )}
+                  ) : (
+                    <Icon as={RedditFace} />
+                  )}
+                </Box>
               </Flex>
               {selectedFile &&
                 (isLoading ? (

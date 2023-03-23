@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Box, Flex, Icon, Text, Button, Image } from "@chakra-ui/react";
 
 // import RedditFace from "../Layout/Navbar/RedditFace";
@@ -12,6 +13,7 @@ import {
 
 // props coming from serverside
 const Header = ({ communityData: initialCommunityData }) => {
+  const [processImage, setProccessImage] = useState(true);
   const { setModalSettings } = useContext(AuthModalContext);
   const { data: user } = useUserAuth();
   const { data: communitySnippets } = useFetchCommunitySnippets();
@@ -19,9 +21,15 @@ const Header = ({ communityData: initialCommunityData }) => {
   const { data: currentCommunity, isLoading: currentIsloading } =
     useCommunityData(initialCommunityData);
 
-  const isJoined = communitySnippets?.find(
-    (item) => item.communityId === currentCommunity?.id
-  );
+  // if undefined do not show button
+  // if communityData exist run array method, and if nothing is found return null
+  // now we can display the button since we have performed the array method. if !== undefined render button
+  let isJoined;
+  isJoined = communitySnippets
+    ? communitySnippets.find(
+        (item) => item.communityId === currentCommunity?.id
+      ) ?? null
+    : undefined;
 
   const { isLoading, mutate } = useOnJoinorLeaveCommunity();
 
@@ -40,18 +48,34 @@ const Header = ({ communityData: initialCommunityData }) => {
         <Flex className="w-[95%] max-w-screen-2xl mx-auto px-4">
           <Flex justify="center" align="center" mt="-6" height="full">
             <Box
-              maxW="20"
-              maxH="20"
-              overflow="hidden"
+              boxSize="90px"
               border="4px"
               borderRadius="full"
               borderColor="white"
+              position="relative"
+              overflow="hidden"
+              bg="gray.100"
             >
-              {currentCommunity?.imageURL ? (
-                <Image src={currentCommunity.imageURL} alt="community image" />
-              ) : (
-                <Icon as={RedditFace} />
-              )}
+              <Box
+                as={motion.div}
+                key={currentCommunity}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.8 } }}
+              >
+                {currentCommunity?.imageURL ? (
+                  <Image
+                    onLoad={() => setProccessImage(false)}
+                    src={currentCommunity.imageURL}
+                    display={processImage ? "none" : "flex"}
+                    alt="community image"
+                    position="absolute"
+                    objectFit="cover"
+                    height="90px"
+                  />
+                ) : (
+                  <Icon as={RedditFace} />
+                )}
+              </Box>
             </Box>
           </Flex>
           <Flex mx="4" pt="2">
@@ -63,14 +87,22 @@ const Header = ({ communityData: initialCommunityData }) => {
                 r/{currentCommunity?.id}
               </Text>
             </Box>
-            <Button
-              // variant="outline"
-              _hover={!isJoined && { backgroundColor: "blue.600" }}
-              isLoading={isLoading}
-              onClick={onClickHandler}
-            >
-              {isJoined ? "Joined" : "Join"}
-            </Button>
+            <Box as={motion.div} layout>
+              {isJoined !== undefined && (
+                <Button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  as={motion.button}
+                  _hover={
+                    !isJoined && { backgroundColor: "blue.500", color: "white" }
+                  }
+                  isLoading={isLoading}
+                  onClick={onClickHandler}
+                >
+                  {isJoined ? "Joined" : "Join"}
+                </Button>
+              )}
+            </Box>
           </Flex>
         </Flex>
       </Flex>
@@ -82,7 +114,7 @@ export default Header;
 
 const RedditFace = () => {
   return (
-    <svg width="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+    <svg width="inherit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
       <g>
         <circle fill="#FF4500" cx="10" cy="10" r="10"></circle>
         <path

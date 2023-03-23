@@ -24,7 +24,7 @@ const Comments = ({ children, postId, user }) => {
     {
       enabled: Boolean(postId),
       onError: (error) => console.log(error),
-      onSuccess: (comments) => console.log("comments fetched", comments),
+      onSuccess: () => {},
     }
   );
 

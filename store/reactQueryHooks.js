@@ -203,6 +203,16 @@ export const useOnJoinorLeaveCommunity = () => {
       queryClient.invalidateQueries(["communitySnippets"]);
       // get the response back from firebase,
       // instead of invalidating we can grab the community snippets and append the response to it and then manual set the query cache. that way we dont have to wait for an invalidation to update
+
+      // update the amount of members in the community
+      const communityCache = queryClient.getQueryData(["currentCommunity"]);
+
+      console.log(communityCache);
+
+      // queryClient.setQueryData(["currentCommunity"], {
+      //   ...communityCache,
+      //   numberOfMembers: communityCache.numberOfMembers++,
+      // });
     },
     onError: (error) => {
       console.log(error);
