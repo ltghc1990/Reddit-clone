@@ -12,14 +12,14 @@ import {
 } from "../../store/reactQueryHooks";
 
 // props coming from serverside
-const Header = ({ communityData: initialCommunityData }) => {
+const Header = ({ communityData }) => {
   const [processImage, setProccessImage] = useState(true);
   const { setModalSettings } = useContext(AuthModalContext);
   const { data: user } = useUserAuth();
   const { data: communitySnippets } = useFetchCommunitySnippets();
 
   const { data: currentCommunity, isLoading: currentIsloading } =
-    useCommunityData(initialCommunityData);
+    useCommunityData(communityData);
 
   // if undefined do not show button
   // if communityData exist run array method, and if nothing is found return null

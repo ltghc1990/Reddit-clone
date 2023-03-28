@@ -43,7 +43,7 @@ const Directory = () => {
         >
           <Flex align="center">
             {currentCommunity?.imageURL ? (
-              <Box boxSize={6} mr="2">
+              <Flex boxSize={6} mr="2" borderRadius="full" overflow="hidden">
                 {currentCommunity.id == "Home" ? (
                   <Icon as={HouseIcon} />
                 ) : (
@@ -52,7 +52,7 @@ const Directory = () => {
                     alt={currentCommunity.id}
                   />
                 )}
-              </Box>
+              </Flex>
             ) : (
               <Box mr="2">
                 <Icon as={() => RedditFace({ size: "24px" })} />

@@ -11,6 +11,8 @@ import {
 } from "@chakra-ui/react";
 import moment from "moment";
 
+import { aboutMotionParent, aboutMotionChild } from "../../store/motionValues";
+
 import Image from "next/image";
 
 import { useRouter } from "next/router";
@@ -26,21 +28,19 @@ import { useSelectFile } from "../../store/useSelectFile";
 import { AuthModalContext } from "../../store/AuthModalProvider";
 import { useCommunityData } from "../../store/reactQueryHooks";
 
-// About component may render with props.
-// no props on refresh so ....
+// About component may render with currentCommunity props
 const About = (props) => {
-  const { modalSettings, setModalSettings } = useContext(AuthModalContext);
+  const { setModalSettings } = useContext(AuthModalContext);
   const router = useRouter();
 
   const queryClient = useQueryClient();
   const selectedFileRef = useRef();
   const { data: user } = useUserAuth();
-  const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
-  const { data, isLoading, error, mutate } = useMutation(uploadCommunityIcon);
+  const { selectedFile, onSelectFile } = useSelectFile();
+  const { isLoading, error, mutate } = useMutation(uploadCommunityIcon);
 
-  const { data: communityData, communityDataIsLoading } = useCommunityData(
-    props.communityData
-  );
+  const { data: communityData, isLoading: communityDataIsLoading } =
+    useCommunityData(props.communityData);
 
   const handleCreatePost = () => {
     if (!user) {
@@ -68,12 +68,8 @@ const About = (props) => {
     );
   };
 
-  if (communityDataIsLoading) {
-    return <></>;
-  }
-
   return (
-    <Box position="sticky">
+    <Box {...aboutMotionParent} variants={aboutMotionParent} position="sticky">
       <Flex
         justify="space-between"
         p="3"
@@ -85,7 +81,7 @@ const About = (props) => {
         <Icon as={TripleDotsHorizontal} />
       </Flex>
       <Stack bg="white" p="3" borderRadius="0px 0px 4px 4px">
-        <Flex>
+        <Flex as={aboutMotionChild.as} variants={aboutMotionChild}>
           <Flex direction="column" flexGrow="1" fontWeight="bold">
             <Text>{communityData?.numberOfMembers?.toLocaleString()}</Text>
             <Text>Members</Text>
@@ -96,73 +92,92 @@ const About = (props) => {
           </Flex>
         </Flex>
         <Divider />
-        <Flex>
-          <Icon as={CakeIcon} />
-          <Text ml="2">
-            Created{" "}
-            {moment(new Date(communityData?.createdAt?.seconds * 1000)).format(
-              "MMM DD, YYYY"
-            )}
-          </Text>
+
+        <Flex
+          as={aboutMotionChild.as}
+          variants={aboutMotionChild}
+          height={communityData ? "unset" : "24px"}
+        >
+          {communityData && (
+            <>
+              <Icon as={CakeIcon} />
+              <Text ml="2">
+                Created{" "}
+                {moment(
+                  new Date(communityData?.createdAt?.seconds * 1000)
+                ).format("MMM DD, YYYY")}
+              </Text>
+            </>
+          )}
         </Flex>
 
         <Button onClick={handleCreatePost} mt="3">
           Create Post
         </Button>
 
-        {user?.uid === communityData?.creatorId && (
-          <>
-            <Divider />
-            <Stack spacing="1" fontSize="10">
-              <Text fontWeight="600">Admin</Text>
-              <Flex align="center" justify="space-between">
-                <Text
-                  color="blue.500"
-                  cursor="pointer"
-                  _hover={{ textDecoration: "underline" }}
-                  onClick={() => selectedFileRef.current?.click()}
-                >
-                  Change Image
-                </Text>
-                <Box
-                  border="2px"
-                  boxSize="42px"
-                  overflow="hidden"
-                  borderRadius="full"
-                  borderColor="gray.200"
-                  position="relative"
-                >
-                  {communityData?.imageURL || selectedFile ? (
-                    <Image
-                      src={selectedFile || communityData.imageURL}
-                      alt="community image"
-                      objectFit="cover"
-                      layout="fill"
-                      position="absolute"
-                    />
-                  ) : (
-                    <Icon as={RedditFace} />
-                  )}
-                </Box>
-              </Flex>
-              {selectedFile &&
-                (isLoading ? (
-                  <Spinner />
-                ) : (
-                  <Text cursor="pointer" onClick={onUpdateImage}>
-                    Save Changes
-                  </Text>
-                ))}
-              <Input
-                ref={selectedFileRef}
-                id="file-upload"
-                type="file"
-                hidden
-                onChange={onSelectFile}
-              />
-            </Stack>
-          </>
-        )}
+        <Box as={aboutMotionChild.as} variants={aboutMotionChild}>
+          {!communityDataIsLoading &&
+            user?.uid === communityData?.creatorId && (
+              <>
+                <Divider />
+                <Stack spacing="1" fontSize="10" mt="2">
+                  <Flex align="center" justify="space-between">
+                    <Flex direction="column">
+                      <Text fontWeight="600">Admin</Text>
+                      <Text
+                        color="blue.500"
+                        cursor="pointer"
+                        _hover={{ textDecoration: "underline" }}
+                        onClick={() => selectedFileRef.current?.click()}
+                      >
+                        Change Image
+                      </Text>
+                    </Flex>
+
+                    {communityData?.imageURL || selectedFile ? (
+                      <Box
+                        border="2px"
+                        boxSize="42px"
+                        overflow="hidden"
+                        borderRadius="full"
+                        borderColor="gray.200"
+                        position="relative"
+                      >
+                        <Image
+                          src={selectedFile || communityData.imageURL}
+                          alt="community image"
+                          objectFit="cover"
+                          layout="fill"
+                          position="absolute"
+                        />
+                      </Box>
+                    ) : (
+                      <Icon as={() => RedditFace({ size: "42px" })} />
+                    )}
+                  </Flex>
+                  {selectedFile &&
+                    (isLoading ? (
+                      <Spinner />
+                    ) : (
+                      <Text
+                        cursor="pointer"
+                        _hover={{ textDecoration: "underline" }}
+                        onClick={onUpdateImage}
+                      >
+                        Save Changes
+                      </Text>
+                    ))}
+                  <Input
+                    ref={selectedFileRef}
+                    id="file-upload"
+                    type="file"
+                    hidden
+                    onChange={onSelectFile}
+                  />
+                </Stack>
+              </>
+            )}
+        </Box>
       </Stack>
     </Box>
   );

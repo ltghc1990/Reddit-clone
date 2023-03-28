@@ -9,7 +9,10 @@ import About from "../../../components/community/About";
 
 const SubmitPostPage = () => {
   const { data, isLoading, error } = useCommunityData();
-  console.log(data);
+
+  // about commponent mounts, unmounts, mounts again causing flicker
+  // has something to do with the layout key making it do that
+  // and the only reason why I have the key is so that react query doesnt break
   return (
     <PageContent>
       <>
@@ -25,9 +28,7 @@ const SubmitPostPage = () => {
 
         <NewPostForm communityImageURL={data?.imageURL} />
       </>
-      <>
-        <About />
-      </>
+      <>{!isLoading && <About communityData={data} />}</>
     </PageContent>
   );
 };

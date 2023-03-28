@@ -220,11 +220,14 @@ export const useOnJoinorLeaveCommunity = () => {
   });
 };
 
-export const useCommunityData = (initialData) => {
+export const useCommunityData = (communityData) => {
   // if no community id, means we are on the home page.
 
   const router = useRouter();
   const { communityId } = router.query;
+
+  // cant be called initialData since it will conflict with useQuery; it'll think there will be initialData when theres not causing isLoading to always be false
+  const initial = communityData ? { initialData: communityData } : null;
 
   const getFirestoreCommunityData = async () => {
     const communityDocRef = doc(firestore, "communities", communityId);
@@ -234,7 +237,7 @@ export const useCommunityData = (initialData) => {
 
   return useQuery(["currentCommunity"], getFirestoreCommunityData, {
     enabled: Boolean(communityId),
-    initialData: initialData,
+    initial,
   });
 };
 
