@@ -17,8 +17,10 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutate({ ...loginForm });
-    console.log(FIREBASE_ERRORS[error?.message]);
+    mutate(
+      { ...loginForm },
+      { onError: () => console.log(FIREBASE_ERRORS[error?.message]) }
+    );
   };
 
   return (

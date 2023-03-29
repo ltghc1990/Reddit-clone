@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 export const basicMotion = {
   as: motion.div,
   initial: { opacity: 0 },
-  animate: { opacity: 1, transition: { duration: 2 } },
+  animate: { opacity: 1, transition: { duration: 0.4 } },
   exit: { opacity: 0 },
 };
 
@@ -14,7 +14,7 @@ export const aboutMotionParent = {
   show: {
     opacity: 1,
 
-    transition: { duration: 0.7, when: "beforeChildren", staggerChildren: 0.2 },
+    transition: { duration: 0.4, when: "beforeChildren", staggerChildren: 0.2 },
   },
   unmount: { opacity: 0 },
   initial: "hide",

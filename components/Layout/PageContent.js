@@ -1,5 +1,7 @@
 import React from "react";
 import { Flex } from "@chakra-ui/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { basicMotion } from "../../store/motionValues";
 const PageContent = ({ children }) => {
   return (
     <Flex
@@ -8,7 +10,12 @@ const PageContent = ({ children }) => {
       className=" max-w-screen-2xl"
       py={{ base: 4, md: 6, lg: 8 }}
     >
-      <Flex className="w-full " py="4" px={{ base: "none", sm: 4, lg: 8 }}>
+      <Flex
+        {...basicMotion}
+        className="w-full "
+        py="4"
+        px={{ base: "none", sm: 4, lg: 8 }}
+      >
         <Flex
           direction="column"
           width={{ base: "100%", md: "65%", lg: "70%" }}

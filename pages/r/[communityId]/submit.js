@@ -21,11 +21,11 @@ const SubmitPostPage = () => {
             fontWeight="700"
             color="gray.600"
             fontSize={{ base: "md", md: "lg" }}
+            mx={{ base: 2, sm: "unset" }}
           >
             Create a Post
           </Text>
         </Box>
-
         <NewPostForm communityImageURL={data?.imageURL} />
       </>
       <>{!isLoading && <About communityData={data} />}</>

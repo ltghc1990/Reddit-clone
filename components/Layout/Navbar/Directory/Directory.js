@@ -31,7 +31,6 @@ const Directory = () => {
       <Menu isOpen={isOpen}>
         <MenuButton
           size={{ base: "xs", sm: "sm", md: "md" }}
-          maxWidth={{ base: "105px", sm: "unset" }}
           ref={buttonRef}
           onClick={toggleCommunityMenu}
           as={Button}

@@ -11,14 +11,14 @@ const TextInputs = ({
   return (
     <Stack spacing={3} p={{ base: 2, md: 4, lg: 6 }}>
       <Input
-        fontSize="sm"
+        fontSize={{ base: "12px", md: "14px", lg: "16px" }}
         placeholder="Title"
         name="title"
         value={textInputs.title}
         onChange={(e) => onTextChange(e)}
       />
       <Textarea
-        fontSize="sm"
+        fontSize={{ base: "12px", md: "14px", lg: "16px" }}
         placeholder="Text (required)"
         name="body"
         height="100px"

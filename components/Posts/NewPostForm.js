@@ -121,6 +121,7 @@ const NewPostForm = ({ communityImageURL }) => {
               fontWeight="700"
               borderColor="gray.200"
               borderWidth="0px 1px 1px 0px"
+              fontSize={{ base: "12px", md: "14px", lg: "16px" }}
             >
               {index === currentIndex && (
                 <Box
@@ -136,11 +137,15 @@ const NewPostForm = ({ communityImageURL }) => {
               )}
 
               <Flex
+                align="center"
                 mx="auto"
                 color={index === currentIndex ? "blue.500" : "gray.500"}
                 _groupHover={index !== currentIndex && { color: "gray.800" }}
               >
-                <Icon as={item.icon} />
+                <Box mr="2px" display={{ base: "none", sm: "block" }}>
+                  <Icon as={item.icon} />
+                </Box>
+
                 <Text>{item.title}</Text>
               </Flex>
             </Flex>

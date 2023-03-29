@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Box, Flex, Icon, Text, Button, Image } from "@chakra-ui/react";
 
 // import RedditFace from "../Layout/Navbar/RedditFace";
@@ -43,12 +43,12 @@ const Header = ({ communityData }) => {
 
   return (
     <>
-      <Box h="20" bg="blue.400" />
-      <Flex bg="white" h="20">
+      <Box h={{ base: "16", sm: "20" }} bg="blue.400" />
+      <Flex bg="white" h={{ base: "16", sm: "20" }}>
         <Flex className="w-[95%] max-w-screen-2xl mx-auto px-4">
           <Flex justify="center" align="center" mt="-6" height="full">
             <Box
-              boxSize="90px"
+              boxSize={{ base: "54px", md: "72px", lg: "90px" }}
               border="4px"
               borderRadius="full"
               borderColor="white"
@@ -70,7 +70,7 @@ const Header = ({ communityData }) => {
                     alt="community image"
                     position="absolute"
                     objectFit="cover"
-                    height="90px"
+                    height={{ base: "54px", md: "72px", lg: "90px" }}
                   />
                 ) : (
                   <Icon as={RedditFace} />
@@ -80,7 +80,7 @@ const Header = ({ communityData }) => {
           </Flex>
           <Flex mx="4" pt="2">
             <Box mr="4">
-              <Text fontWeight="800" fontSize="22px">
+              <Text fontWeight="800" fontSize={{ base: "18px", md: "22px" }}>
                 {currentCommunity?.id}
               </Text>
               <Text className="text-xs" color="gray.500">
@@ -93,6 +93,7 @@ const Header = ({ communityData }) => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   as={motion.button}
+                  size={{ base: "sm", md: "md" }}
                   _hover={
                     !isJoined && { backgroundColor: "blue.500", color: "white" }
                   }

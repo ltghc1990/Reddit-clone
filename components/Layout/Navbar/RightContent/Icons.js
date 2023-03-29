@@ -27,7 +27,7 @@ const Icons = () => {
         </Flex>
       </HStack>
 
-      <HStack spacing={2} ml="2">
+      <HStack display={{ base: "none", sm: "flex" }} spacing={2} ml="2">
         <Flex color="gray.700" cursor="pointer">
           <Chat />
         </Flex>
